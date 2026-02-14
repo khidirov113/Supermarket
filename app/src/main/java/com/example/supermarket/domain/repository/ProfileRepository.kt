@@ -1,0 +1,17 @@
+package com.example.supermarket.domain.repository
+
+import com.example.supermarket.domain.entity.UserProfile
+
+interface ProfileRepository {
+    suspend fun updateProfile(
+        name: String?,
+        surname: String?,
+        bornIn: String?,
+        gender: Int?,
+        imagePath: String?
+    ): Result<Unit>
+
+    suspend fun logout(): Result<Unit>
+
+    suspend fun getUserProfile(): Result<UserProfile>
+}
