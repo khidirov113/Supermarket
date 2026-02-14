@@ -9,18 +9,21 @@ import com.example.supermarket.data.remote.network.CatalogApiService
 import com.example.supermarket.data.remote.network.ProductApi
 import com.example.supermarket.data.remote.network.ProfileApi
 import com.example.supermarket.data.remote.network.QrApi
+import com.example.supermarket.data.remote.network.StoreApi
 import com.example.supermarket.data.repository.AuthRepositoryImpl
 import com.example.supermarket.data.repository.BannerRepositoryImpl
 import com.example.supermarket.data.repository.CatalogRepositoryImpl
 import com.example.supermarket.data.repository.ProductRepositoryImpl
 import com.example.supermarket.data.repository.ProfileRepositoryImpl
 import com.example.supermarket.data.repository.QrRepositoryImpl
+import com.example.supermarket.data.repository.StoreRepositoryImpl
 import com.example.supermarket.domain.repository.AuthRepository
 import com.example.supermarket.domain.repository.BannerRepository
 import com.example.supermarket.domain.repository.CatalogRepository
 import com.example.supermarket.domain.repository.ProductRepository
 import com.example.supermarket.domain.repository.ProfileRepository
 import com.example.supermarket.domain.repository.QrRepository
+import com.example.supermarket.domain.repository.StoreRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -49,6 +52,12 @@ abstract class DataModule {
     abstract fun bindProfileRepository(
         impl: ProfileRepositoryImpl
     ): ProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindStoreRepository(
+        impl: StoreRepositoryImpl
+    ): StoreRepository
 
     @Binds
     @Singleton
@@ -166,6 +175,10 @@ abstract class DataModule {
         @Provides
         @Singleton
         fun provideAuthApiService(retrofit: Retrofit): AuthApi = retrofit.create()
+
+        @Provides
+        @Singleton
+        fun provideStoreApiService(retrofit: Retrofit): StoreApi = retrofit.create()
 
         @Provides
         @Singleton

@@ -61,7 +61,7 @@ fun SettingScreen(
     onNavigateToEditProfile: () -> Unit,
     onLogoutSuccess: () -> Unit,
     onNavigateToAuth: () -> Unit,
-    ) {
+) {
     val isAuthenticated by viewModel.isAuthenticated.collectAsState(initial = false)
     val user = viewModel.userData
 
@@ -91,7 +91,7 @@ fun SettingScreen(
             if (isAuthenticated) {
                 ProfileHeaderCard(
                     name = "${user?.lastName ?: ""} ${user?.firstName ?: ""}".trim(),
-                    phone = "+${user?.phone}"?: " ",
+                    phone = "+${user?.phone}" ?: " ",
                     onClick = onNavigateToEditProfile
                 )
             } else {
@@ -400,7 +400,7 @@ fun ProfileHeaderCard(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(24.dp),
-        color = Color(0xFFF7F7F7), // Оч кулранг фон
+        color = Color(0xFFF7F7F7),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
@@ -409,7 +409,6 @@ fun ProfileHeaderCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Аватар
             Box(
                 modifier = Modifier
                     .size(54.dp)
@@ -444,12 +443,6 @@ fun ProfileHeaderCard(
                     )
                 )
             }
-
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = null,
-                tint = Color.Black
-            )
         }
     }
 }
@@ -458,8 +451,8 @@ fun ProfileHeaderCard(
 fun LogoutButton(onClick: () -> Unit) {
     SettingButton(
         text = "Выйти",
-        iconRes = R.drawable.ic_logout, // Қизил чиқиш иконкаси
-        containerColor = Color(0xFFFFF5F5), // Жуда оч қизил фон
+        iconRes = R.drawable.ic_logout,
+        containerColor = Color(0xFFFFF5F5),
         iconBackgroundColor = Color.White,
         colorIcon = Red,
         onClick = onClick

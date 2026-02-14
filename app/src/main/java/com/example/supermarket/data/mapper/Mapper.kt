@@ -4,11 +4,13 @@ import com.example.supermarket.data.remote.dto.AccessCodeDto
 import com.example.supermarket.data.remote.dto.BannerDto
 import com.example.supermarket.data.remote.dto.CategoryDto
 import com.example.supermarket.data.remote.dto.ProductDto
+import com.example.supermarket.data.remote.dto.StoreDto
 import com.example.supermarket.data.remote.dto.UserProfileDto
 import com.example.supermarket.domain.entity.Banner
 import com.example.supermarket.domain.entity.Category
 import com.example.supermarket.domain.entity.Product
 import com.example.supermarket.domain.entity.QrCodeData
+import com.example.supermarket.domain.entity.Store
 import com.example.supermarket.domain.entity.UserProfile
 
 
@@ -65,3 +67,11 @@ fun AccessCodeDto.toDomain(): QrCodeData {
         expiresAt = this.expiresAt
     )
 }
+
+
+fun StoreDto.toDomain() = Store(
+    name = name,
+    latitude = lat,
+    longitude = lng,
+    address = address ?: ""
+)

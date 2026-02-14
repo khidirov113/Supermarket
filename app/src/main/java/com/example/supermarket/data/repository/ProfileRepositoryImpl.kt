@@ -25,12 +25,17 @@ class ProfileRepositoryImpl @Inject constructor(
         return try {
             val response = api.getUser()
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!.toDomain())
+                val user = response.body()!!.toDomain()
+                Log.d(TAG, "getUserProfile: SUCCESS. User: ${user.firstName} ${user.lastName}")
+                Result.success(user)
             } else {
-                Result.failure(Exception("Сервер хатоси"))
+                Log.e(TAG, "getUserProfile: FAILED. Code: ${response.code()}, Error: ${response.errorBody()?.string()}")
+                Result.failure(Exception("Error"))
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Интернет билан муаммо: ${e.message}")
             Result.failure(e)
+
         }
     }
 

@@ -22,6 +22,7 @@ material3 = "1.4.0"
 materialIconsCore = "1.7.8"
 navigationCompose = "2.9.6"
 ksp = "2.3.4"
+osmdroidAndroid = "6.1.20"
 retrofit = "3.0.0"
 roomRuntime = "2.8.4"
 datastorePreferences = "1.2.0"
@@ -55,8 +56,8 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 #Retrofit
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterGson" }
+osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 #Material
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 #Datastore

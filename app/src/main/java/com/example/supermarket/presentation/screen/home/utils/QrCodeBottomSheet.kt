@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.supermarket.presentation.ui.theme.Green
-import com.example.supermarket.presentation.ui.theme.Grey200
 import com.example.supermarket.presentation.ui.theme.White200
 import com.example.supermarket.presentation.utils.generateQrCode
 
@@ -65,7 +64,7 @@ fun QrCodeBottomSheet(
                     onClick = onDismiss,
                     modifier = Modifier
                         .size(32.dp)
-                        .background(Grey200, CircleShape)
+                        .background(Color(0xFFF5F5F5), CircleShape)
                 ) {
                     Icon(
                         Icons.Default.Close,
@@ -80,7 +79,7 @@ fun QrCodeBottomSheet(
                 modifier = Modifier
                     .padding(vertical = 20.dp)
                     .size(240.dp),
-                color = Grey200,
+                color = White200,
                 shape = RoundedCornerShape(32.dp)
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(25.dp)) {

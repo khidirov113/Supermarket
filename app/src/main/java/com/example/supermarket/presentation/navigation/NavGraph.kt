@@ -11,6 +11,7 @@ import com.example.supermarket.presentation.screen.catalog.SearchScreen
 import com.example.supermarket.presentation.screen.home.HomeScreen
 import com.example.supermarket.presentation.screen.home.banner.BannerDetailScreen
 import com.example.supermarket.presentation.screen.home.product.ProductsWeekSaleScreen
+import com.example.supermarket.presentation.screen.map.MapScreen
 import com.example.supermarket.presentation.screen.settings.NotificationScreen
 import com.example.supermarket.presentation.screen.settings.SettingScreen
 import com.example.supermarket.presentation.screen.settings.profile.ProfileEditScreen
@@ -89,7 +90,9 @@ fun NavGraph(
             )
         }
 
-        composable("map") { SimpleTextScreen("Map") }
+        composable("map") {
+            MapScreen()
+        }
         composable("settings") {
             SettingScreen(
                 onNavigateToEditProfile = { navController.navigate(Screens.Profile.route) },
@@ -141,7 +144,6 @@ sealed class Screens(val route: String) {
     object AuthScreen : Screens("auth_screen")
     object Profile : Screens("profile")
     object Catalog : Screens("catalog")
-    object SubCategoryProducts : Screens("subcategory_products/{subCategoryId}/{title}")
-    object ProductDetail : Screens("product_detail/{productId}")
+    object MapScreen: Screens("map")
 
 }

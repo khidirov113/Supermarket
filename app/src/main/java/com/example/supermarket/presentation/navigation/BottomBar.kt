@@ -71,10 +71,8 @@ fun BottomBar(
                 FloatingActionButton(
                     onClick = {
                         if (isAuthenticated) {
-                            // 2-ҲОЛАТ: Фойдаланувчи кирган бўлса, QR-код ойнасини очамиз
                             showQrSheet = true
                         } else {
-                            // 1-ҲОЛАТ: Фойдаланувчи меҳмон бўлса, авторизация таклиф қиламиз
                             showAuthSheet = true
                         }
                     },
@@ -124,7 +122,6 @@ fun BottomBar(
                 onDismiss = { showAuthSheet = false },
                 onLoginClick = {
                     showAuthSheet = false
-                    // AuthScreen га йўналтириш
                     navController.navigate(Screens.AuthScreen.route)
                 }
             )

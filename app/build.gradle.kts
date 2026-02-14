@@ -85,6 +85,8 @@ dependencies {
     ksp(libs.androidx.hilt.compiler)
     //QrCode
     implementation(libs.core)
+    // OSM
+    implementation(libs.osmdroid.android)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
