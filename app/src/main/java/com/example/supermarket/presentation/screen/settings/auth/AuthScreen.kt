@@ -1,323 +1,286 @@
-//package com.example.supermarket.presentation.screen.settings.auth
-//
-//import androidx.compose.foundation.background
-//import androidx.compose.foundation.border
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.shape.RoundedCornerShape
-//import androidx.compose.foundation.text.BasicTextField
-//import androidx.compose.foundation.text.KeyboardOptions
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.automirrored.filled.ArrowBack
-//import androidx.compose.material.icons.filled.ArrowBack
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.*
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.draw.clip
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.text.SpanStyle
-//import androidx.compose.ui.text.buildAnnotatedString
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.text.input.KeyboardType
-//import androidx.compose.ui.text.style.TextAlign
-//import androidx.compose.ui.text.withStyle
-//import androidx.compose.ui.tooling.preview.Preview
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//import androidx.hilt.navigation.compose.hiltViewModel
-//import androidx.lifecycle.compose.collectAsStateWithLifecycle
-//
-//private val BrandGreen = Color(0xFF00C853)
-//private val TextGray = Color(0xFF9E9E9E)
-//private val InputBg = Color(0xFFF5F5F5)
-//
-//@Composable
-//fun AuthScreen(
-//    viewModel: AuthViewModel = hiltViewModel(),
-//    onSuccess: () -> Unit,
-//    onBack: () -> Unit
-//) {
-//    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-//
-//    LaunchedEffect(uiState.isAuthorized) {
-//        if (uiState.isAuthorized) {
-//            onSuccess()
-//        }
-//    }
-//
-//    Scaffold(
-//        modifier = Modifier.imePadding(),
-//        containerColor = Color.White
-//    ) { paddingValues ->
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//        ) {
-//            if (!uiState.isCodeSent) {
-//                PhoneInputContent(
-//                    phone = uiState.phone,
-//                    isLoading = uiState.isLoading,
-//                    onPhoneChanged = viewModel::onPhoneChange,
-//                    onContinueClicked = viewModel::sendCode
-//                )
-//            } else {
-//                OtpInputContent(
-//                    phone = uiState.phone,
-//                    code = uiState.code,
-//                    isLoading = uiState.isLoading,
-//                    onCodeChanged = viewModel::onCodeChange,
-//                    onVerifyClicked = viewModel::verifyCode,
-//                    onResendClicked = {  }
-//                )
-//            }
-//
-//            if (uiState.errorMessage != null) {
-//                Snackbar(
-//                    modifier = Modifier
-//                        .align(Alignment.BottomCenter)
-//                        .padding(16.dp),
-//                    containerColor = MaterialTheme.colorScheme.error
-//                ) {
-//                    Text(text = uiState.errorMessage!!)
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun PhoneInputContent(
-//    phone: String,
-//    isLoading: Boolean,
-//    onPhoneChanged: (String) -> Unit,
-//    onContinueClicked: () -> Unit
-//) {
-//    val isPhoneValid = phone.length == 9
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(horizontal = 24.dp, vertical = 16.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
-//             IconButton(onClick = { }) {
-//                 Icon(Icons.Default.ArrowBack, contentDescription = null)
-//             }
-//        }
-//
-//        Spacer(modifier = Modifier.height(40.dp))
-//
-//        Text(
-//            text = "Войдите в систему",
-//            fontSize = 24.sp,
-//            fontWeight = FontWeight.Bold,
-//            color = Color.Black
-//        )
-//        Spacer(modifier = Modifier.height(8.dp))
-//        Text(
-//            text = "Введите номер телефона\nдля входа",
-//            fontSize = 16.sp,
-//            color = TextGray,
-//            textAlign = TextAlign.Center
-//        )
-//
-//        Spacer(modifier = Modifier.height(48.dp))
-//
-//        OutlinedTextField(
-//            value = phone,
-//            onValueChange = { if (it.length <= 9 && it.all { char -> char.isDigit() }) onPhoneChanged(it) },
-//            modifier = Modifier.fillMaxWidth(),
-//            textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
-//            prefix = {
-//                Text(text = "+992 ", fontSize = 18.sp, color = Color.Black)
-//            },
-//            shape = RoundedCornerShape(12.dp),
-//            colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = BrandGreen,
-//                unfocusedBorderColor = Color.LightGray,
-//                cursorColor = BrandGreen
-//            ),
-//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//            singleLine = true,
-//            enabled = !isLoading
-//        )
-//
-//        Spacer(modifier = Modifier.weight(1f))
-//
-//        Button(
-//            onClick = onContinueClicked,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(56.dp),
-//            colors = ButtonDefaults.buttonColors(
-//                containerColor = BrandGreen,
-//                disabledContainerColor = BrandGreen.copy(alpha = 0.5f)
-//            ),
-//            shape = RoundedCornerShape(12.dp),
-//            enabled = isPhoneValid && !isLoading
-//        ) {
-//            if (isLoading) {
-//                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-//            } else {
-//                Text(text = "Войти", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-//            }
-//        }
-//        Spacer(modifier = Modifier.height(16.dp))
-//    }
-//}
-//
-//@Composable
-//fun OtpInputContent(
-//    phone: String,
-//    code: String,
-//    isLoading: Boolean,
-//    onCodeChanged: (String) -> Unit,
-//    onVerifyClicked: () -> Unit,
-//    onResendClicked: () -> Unit
-//) {
-//    val isCodeValid = code.length == 4
-//
-//    val maskedPhone = remember(phone) {
-//        if (phone.length == 9) {
-//            "+ 992 ${phone.substring(0, 2)} *** ** ${phone.substring(7, 9)}"
-//        } else {
-//            "+ 992 $phone"
-//        }
-//    }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(horizontal = 24.dp, vertical = 16.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Spacer(modifier = Modifier.height(40.dp))
-//        Text(
-//            text = "Код подтверждения",
-//            fontSize = 24.sp,
-//            fontWeight = FontWeight.Bold,
-//            color = Color.Black
-//        )
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        val annotatedString = buildAnnotatedString {
-//            append("Мы отправили код на номер\n")
-//            withStyle(style = SpanStyle(fontWeight = FontWeight.Medium, color = Color.Black)) {
-//                append(maskedPhone)
-//            }
-//        }
-//        Text(
-//            text = annotatedString,
-//            fontSize = 16.sp,
-//            color = TextGray,
-//            textAlign = TextAlign.Center
-//        )
-//
-//        Spacer(modifier = Modifier.height(48.dp))
-//
-//        OtpInputField(
-//            code = code,
-//            onCodeChanged = onCodeChanged,
-//            enabled = !isLoading
-//        )
-//
-//        Spacer(modifier = Modifier.weight(1f))
-//
-//        Button(
-//            onClick = onVerifyClicked,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(56.dp),
-//            colors = ButtonDefaults.buttonColors(
-//                containerColor = BrandGreen,
-//                disabledContainerColor = BrandGreen.copy(alpha = 0.5f)
-//            ),
-//            shape = RoundedCornerShape(12.dp),
-//            enabled = isCodeValid && !isLoading
-//        ) {
-//            if (isLoading) {
-//                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-//            } else {
-//                Text(text = "Далее", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-//            }
-//        }
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        TextButton(
-//            onClick = onResendClicked,
-//            enabled = false,
-//            colors = ButtonDefaults.textButtonColors(disabledContentColor = TextGray)
-//        ) {
-//            Text(text = "Новый код через 00:56 сек.", fontSize = 16.sp)
-//        }
-//        Spacer(modifier = Modifier.height(16.dp))
-//    }
-//}
-//
-//@Composable
-//fun OtpInputField(
-//    code: String,
-//    onCodeChanged: (String) -> Unit,
-//    enabled: Boolean
-//) {
-//    BasicTextField(
-//        value = code,
-//        onValueChange = {
-//            if (it.length <= 4 && it.all { char -> char.isDigit() }) {
-//                onCodeChanged(it)
-//            }
-//        },
-//        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-//        enabled = enabled,
-//        decorationBox = {
-//            Row(
-//                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                repeat(4) { index ->
-//                    val char = when {
-//                        index >= code.length -> ""
-//                        else -> code[index].toString()
-//                    }
-//                    val isFocused = code.length == index
-//
-//                    Box(
-//                        modifier = Modifier
-//                            .size(64.dp) // Размер квадрата
-//                            .clip(RoundedCornerShape(12.dp))
-//                            .background(InputBg)
-//                            .border(
-//                                width = if (isFocused) 2.dp else 0.dp,
-//                                color = if (isFocused) BrandGreen else Color.Transparent,
-//                                shape = RoundedCornerShape(12.dp)
-//                            ),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Text(
-//                            text = char,
-//                            fontSize = 24.sp,
-//                            fontWeight = FontWeight.Bold,
-//                            color = Color.Black
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    )
-//}
-//
-//@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
-//@Composable
-//fun PhoneInputPreview() {
-//
-//    PhoneInputContent(phone = "9296634", isLoading = false, onPhoneChanged = {}, onContinueClicked = {})
-//}
-//
-//@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
-//@Composable
-//fun OtpInputPreview() {
-//    OtpInputContent(phone = "929663474", code = "12", isLoading = false, onCodeChanged = {}, onVerifyClicked = {}, onResendClicked = {})
-//}
+package com.example.supermarket.presentation.screen.settings.auth
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.supermarket.presentation.ui.theme.Green
+import com.example.supermarket.presentation.ui.theme.Grey100
+import com.example.supermarket.presentation.ui.theme.Grey200
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AuthScreen(
+    onAuthSuccess: () -> Unit,
+    onBack: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (viewModel.step == 1) onBack() else viewModel.step = 1
+                    }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        },
+        containerColor = Color.White
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (viewModel.step == 1) {
+                PhoneInputStep(viewModel)
+            } else {
+                OtpInputStep(viewModel, onAuthSuccess)
+            }
+        }
+    }
+}
+
+@Composable
+fun ColumnScope.PhoneInputStep(viewModel: AuthViewModel) {
+    Text(
+        "Войдите в систему",
+        fontSize = 24.sp,
+        color = Color.Black,
+        fontWeight = FontWeight.Bold
+    )
+    Text(
+        "Введите номер телефона для входа",
+        color = Color.Gray,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(vertical = 8.dp)
+    )
+
+    Spacer(modifier = Modifier.height(32.dp))
+
+    OutlinedTextField(
+        value = viewModel.phoneInput,
+        onValueChange = {
+            if (it.length <= 9) viewModel.phoneInput = it
+        },
+        modifier = Modifier.fillMaxWidth(),
+        prefix = { Text("+992 ", color = Color.Black, fontWeight = FontWeight.Medium) },
+        shape = RoundedCornerShape(16.dp),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Grey100,
+            cursorColor = Green,
+            unfocusedBorderColor = Grey100
+        )
+    )
+
+    Spacer(modifier = Modifier.weight(1f))
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .imePadding()
+            .padding(bottom = 24.dp),
+    ) {
+        Button(
+            onClick = { viewModel.onSendCodeClick() },
+            enabled = viewModel.isPhoneValid && !viewModel.isLoading,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(bottom = 10.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (viewModel.isPhoneValid) Green else Grey200,
+                contentColor = if (viewModel.isPhoneValid) Color.White else Color.Gray
+            )
+        ) {
+            if (viewModel.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Войти")
+            }
+        }
+    }
+}
+
+@Composable
+fun ColumnScope.OtpInputStep(viewModel: AuthViewModel, onAuthSuccess: () -> Unit) {
+    val maskedPhone = remember(viewModel.phoneInput) {
+        val phone = viewModel.phoneInput
+        if (phone.length == 9) {
+            "+992 ${phone.substring(0, 2)} *** ** ${phone.substring(7, 9)}"
+        } else {
+            "+992 $phone"
+        }
+    }
+
+    Text(
+        text = "Код подтверждения",
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black
+    )
+
+    Text(
+        text = "Мы отправили код на номер\n$maskedPhone",
+        color = Color.Gray,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+    )
+
+    Spacer(modifier = Modifier.height(32.dp))
+
+    Box(contentAlignment = Alignment.Center) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            repeat(4) { index ->
+                val char = viewModel.code.getOrNull(index)?.toString() ?: ""
+                val isFocused = viewModel.code.length == index
+
+                val borderColor = when {
+                    viewModel.errorMessage != null -> Color.Red
+                    char.isNotEmpty() || isFocused -> Green
+                    else -> Color.Transparent
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(Grey200, RoundedCornerShape(12.dp))
+                        .border(1.5.dp, borderColor, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = char,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
+            }
+        }
+
+        BasicTextField(
+            value = viewModel.code,
+            onValueChange = {
+                if (it.length <= 4) {
+                    viewModel.code = it
+                    viewModel.errorMessage = null
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier
+                .fillMaxWidth()
+                .alpha(0f)
+        )
+    }
+
+    Spacer(modifier = Modifier.weight(1f))
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .imePadding()
+    ) {
+        Button(
+            onClick = { viewModel.onVerifyCodeClick(onAuthSuccess) },
+            enabled = viewModel.code.length == 4 && !viewModel.isLoading,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (viewModel.code.length == 4) Green else Grey200,
+                contentColor = if (viewModel.code.length == 4) Color.White else Color.Gray
+            )
+        ) {
+            if (viewModel.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+            } else {
+                Text("Далее")
+            }
+        }
+
+        val isTimerFinished = viewModel.timerSeconds == 0
+
+        Button(
+            onClick = {
+                if (isTimerFinished) {
+                    viewModel.onSendCodeClick()
+                    viewModel.startTimer()
+                }
+            },
+            enabled = isTimerFinished,
+            modifier = Modifier
+                .padding(top = 12.dp, bottom = 12.dp)
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isTimerFinished) Green else Grey200,
+                contentColor = if (isTimerFinished) Color.White else Color.Gray,
+                disabledContainerColor = Grey200,
+                disabledContentColor = Color.Gray
+            )
+        ) {
+            val time = String.format("00:%02d", viewModel.timerSeconds)
+            Text(
+                text = if (isTimerFinished) "Отправить код еще раз" else "Новый код через $time сек.",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}

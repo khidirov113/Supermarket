@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -49,6 +48,7 @@ import com.example.supermarket.presentation.ui.theme.Blue
 import com.example.supermarket.presentation.ui.theme.CustomIcons
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.Grey
+import com.example.supermarket.presentation.ui.theme.Grey200
 import com.example.supermarket.presentation.ui.theme.Red
 import com.example.supermarket.presentation.ui.theme.White100
 import com.example.supermarket.presentation.ui.theme.White200
@@ -91,7 +91,7 @@ fun SettingScreen(
             if (isAuthenticated) {
                 ProfileHeaderCard(
                     name = "${user?.lastName ?: ""} ${user?.firstName ?: ""}".trim(),
-                    phone = "+${user?.phone}" ?: " ",
+                    phone = "+${user?.phone}",
                     onClick = onNavigateToEditProfile
                 )
             } else {
@@ -400,7 +400,7 @@ fun ProfileHeaderCard(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(24.dp),
-        color = Color(0xFFF7F7F7),
+        color = Grey200,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
@@ -452,7 +452,7 @@ fun LogoutButton(onClick: () -> Unit) {
     SettingButton(
         text = "Выйти",
         iconRes = R.drawable.ic_logout,
-        containerColor = Color(0xFFFFF5F5),
+        containerColor = Grey200,
         iconBackgroundColor = Color.White,
         colorIcon = Red,
         onClick = onClick

@@ -14,7 +14,7 @@ import javax.inject.Inject
 data class QrUiState(
     val isLoading: Boolean = false,
     val code: String? = null,
-    val secondsRemaining: Int = 60, // Таймер учун
+    val secondsRemaining: Int = 60,
     val error: String? = null
 )
 
@@ -30,7 +30,7 @@ class QrViewModel @Inject constructor(
             uiState = uiState.copy(isLoading = true)
             getQrCodeUseCase().onSuccess { data ->
                 uiState = uiState.copy(code = data.code, isLoading = false)
-                startTimer(60) // 60 сониялик таймерни бошлаш
+                startTimer(60)
             }.onFailure { uiState = uiState.copy(isLoading = false) }
         }
     }
@@ -44,7 +44,7 @@ class QrViewModel @Inject constructor(
                 kotlinx.coroutines.delay(1000)
                 current--
             }
-            loadQrCode() // Таймер тугаса кодни янгилаш
+            loadQrCode()
         }
     }
 }

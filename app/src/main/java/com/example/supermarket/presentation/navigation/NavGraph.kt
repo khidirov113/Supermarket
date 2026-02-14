@@ -12,10 +12,9 @@ import com.example.supermarket.presentation.screen.home.HomeScreen
 import com.example.supermarket.presentation.screen.home.banner.BannerDetailScreen
 import com.example.supermarket.presentation.screen.home.product.ProductsWeekSaleScreen
 import com.example.supermarket.presentation.screen.map.MapScreen
-import com.example.supermarket.presentation.screen.settings.NotificationScreen
 import com.example.supermarket.presentation.screen.settings.SettingScreen
+import com.example.supermarket.presentation.screen.settings.auth.AuthScreen
 import com.example.supermarket.presentation.screen.settings.profile.ProfileEditScreen
-import com.example.supermarket.presentation.utils.AuthScreen
 
 @Composable
 fun NavGraph(
@@ -29,9 +28,6 @@ fun NavGraph(
             HomeScreen(
                 onBannerClick = { bannerId ->
                     navController.navigate("banner_detail/$bannerId")
-                },
-                onNotification = {
-                    navController.navigate("notification")
                 },
                 onClickWeekSale = {
                     navController.navigate("product_week_sale")
@@ -71,7 +67,7 @@ fun NavGraph(
         composable(Screens.Catalog.route) {
             CatalogScreen(
                 onCategoryClick = { subCategoryId, title ->
-                    navController.navigate("subcategory_products/$subCategoryId/$title")
+                    //TODO()
                 },
                 onSearch = {
                     navController.navigate("search")
@@ -124,13 +120,6 @@ fun NavGraph(
             )
         }
 
-        composable(
-            route = Screens.Notification.route
-        ) {
-            NotificationScreen(
-                onBackClick = { navController.popBackStack() }
-            )
-        }
     }
 
 }
@@ -144,6 +133,5 @@ sealed class Screens(val route: String) {
     object AuthScreen : Screens("auth_screen")
     object Profile : Screens("profile")
     object Catalog : Screens("catalog")
-    object MapScreen: Screens("map")
 
 }

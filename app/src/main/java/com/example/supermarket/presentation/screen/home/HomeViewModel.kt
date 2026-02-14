@@ -1,7 +1,6 @@
 package com.example.supermarket.presentation.screen.home
 
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -46,14 +45,11 @@ class HomeViewModel @Inject constructor(
             getProfileUseCase()
                 .onSuccess { user ->
                     _userBalance.value = "${user.bonus ?: 0.0} бон."
-                    // ИХТИЁРИЙ: Бу ерда маълумотни базага (Room) сақлаб қўйиш мумкин
                 }
-                .onFailure { error ->
-                    // Интернет бўлмаса, дастурни тўхтатмаймиз
+                .onFailure {
                     if (_userBalance.value == null) {
-                        _userBalance.value = "Оффлайн" // Ёки охирги маълум қиймат
+                        _userBalance.value = "Оффлайн"
                     }
-                    Log.d("HomeVM", "Offline mode: Балансни юклаб бўлмади")
                 }
         }
     }

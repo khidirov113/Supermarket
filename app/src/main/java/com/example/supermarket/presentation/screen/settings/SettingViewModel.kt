@@ -42,8 +42,6 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             getProfileUseCase().onSuccess { profile ->
                 userData = profile
-            }.onFailure {
-                Log.d("SettingViewModel", "fetchProfile: FAILED. ${it.message}")
             }
         }
     }

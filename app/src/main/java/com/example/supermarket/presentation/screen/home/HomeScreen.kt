@@ -47,7 +47,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onNotification: () -> Unit,
     onBannerClick: (Long) -> Unit,
     onClickWeekSale: () -> Unit,
     onNavigateToAuth: () -> Unit,
@@ -78,7 +77,7 @@ fun HomeScreen(
                     }
                 },
                 balance = if (isAuthenticated) balance else null,
-                onNotification = onNotification
+                onNotification = {}
             )
 
             HorizontalDivider(

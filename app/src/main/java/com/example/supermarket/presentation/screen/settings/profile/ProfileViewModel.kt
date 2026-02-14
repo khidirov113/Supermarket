@@ -45,12 +45,11 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
             getProfileUseCase().onSuccess { user ->
-                // Сервердан келган маълумотларни UI State-га ёзамиз
                 uiState = uiState.copy(
-                    name = user.firstName ?: "",
-                    surname = user.lastName ?: "",
-                    bornIn = user.birthDate ?: "",
-                    gender = user.gender ?: 1,
+                    name = user.firstName ,
+                    surname = user.lastName,
+                    bornIn = user.birthDate,
+                    gender = user.gender ,
                     isLoading = false
                 )
             }.onFailure {

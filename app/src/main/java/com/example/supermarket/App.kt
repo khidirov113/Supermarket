@@ -17,6 +17,3 @@ class App: Application(), SingletonImageLoader.Factory {
             .build()
     }
 }
-
-
-//10:06

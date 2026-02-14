@@ -1,6 +1,5 @@
 package com.example.supermarket.data.repository
 
-import android.util.Log
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.BannerApi
 import com.example.supermarket.domain.entity.Banner
@@ -18,7 +17,6 @@ class BannerRepositoryImpl @Inject constructor(
             val response = bannerApi.getBanners()
             val domainList = response.map { it.toDomain() }
             emit(domainList)
-            Log.d("BannerRepositoryImpl", "getBanners: $domainList")
         } catch (e: Exception) {
             throw e
         }

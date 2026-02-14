@@ -1,6 +1,5 @@
-package com.example.supermarket.presentation.utils
+package com.example.supermarket.presentation.screen.settings.auth
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,14 +48,11 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             isLoading = true
-            val fullPhone = "992$phoneInput" // Серверга 992 билан юборамиз
+            val fullPhone = "992$phoneInput"
 
             sendCodeUseCase(fullPhone).onSuccess {
                 step = 2
                 startTimer()
-            }.onFailure { e ->
-                errorMessage = "Хатолик юз берди"
-                Log.e("AUTH", "Error: ${e.message}")
             }
             isLoading = false
         }
@@ -70,8 +66,6 @@ class AuthViewModel @Inject constructor(
             val fullPhone = "992$phoneInput"
             verifySmsUseCase(fullPhone, code).onSuccess {
                 onSuccess()
-            }.onFailure {
-                errorMessage = "Код нотўғри"
             }
             isLoading = false
         }

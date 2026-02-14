@@ -1,10 +1,8 @@
 package com.example.supermarket.presentation.screen.home.product
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.supermarket.domain.entity.Product
-import com.example.supermarket.domain.repository.ProductRepository
 import com.example.supermarket.domain.usecase.product.GetProductByIdUseCase
 import com.example.supermarket.domain.usecase.product.GetSimilarProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,11 +37,9 @@ class ProductDetailViewModel @Inject constructor(
 
                 if (product != null) {
                     val similar = getSimilarProductsUseCase(productId)
-                    Log.d("CHECK_API", "Similar items count: ${similar.size}")
                     _similarProducts.value = similar
                 }
             } catch (e: Exception) {
-                Log.e("CHECK_API", "Error: ${e.message}")
                 _similarProducts.value = emptyList()
             } finally {
                 _isLoading.value = false

@@ -1,6 +1,5 @@
 package com.example.supermarket.data.repository
 
-import android.util.Log
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.ProductApi
 import com.example.supermarket.domain.entity.Product
@@ -15,17 +14,9 @@ class ProductRepositoryImpl @Inject constructor(
     override fun getWeekSales(): Flow<List<Product>> = flow {
         try {
             val response = productApi.getWeekSales()
-            Log.d("CHECK_DATA", "1. Server Response: $response")
-            if (response.isEmpty()) {
-                Log.w("CHECK_DATA", "Server response is empty.")
-            }
             val domainList = response.map { it.toDomain() }
-
-            Log.d("CHECK_DATA", "2. Mapped Data: $domainList")
-
             emit(domainList)
         } catch (e: Exception) {
-            Log.e("CHECK_DATA", "3. ERROR: ${e.message}", e)
             throw e
         }
     }
@@ -39,7 +30,6 @@ class ProductRepositoryImpl @Inject constructor(
             val response = productApi.getSimilarProducts(productId)
             response.map { it.toDomain() }
         } catch (e: Exception) {
-            Log.e("REPO_ERROR", "getSimilarProducts error: ${e.message}")
             emptyList()
         }
     }
