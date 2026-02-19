@@ -1,8 +1,15 @@
 package com.example.supermarket.presentation.screen.settings
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Build
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -17,13 +24,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.supermarket.R
@@ -61,6 +80,8 @@ fun SettingScreen(
     onNavigateToEditProfile: () -> Unit,
     onLogoutSuccess: () -> Unit,
     onNavigateToAuth: () -> Unit,
+    onNavigateToAppSettings: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
 ) {
     val isAuthenticated by viewModel.isAuthenticated.collectAsState(initial = false)
     val user = viewModel.userData
@@ -69,6 +90,39 @@ fun SettingScreen(
 
     var showAuthSheet by remember { mutableStateOf(false) }
 
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutDialog) {
+
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            text = {
+                Text(
+                    text = "Вы действительно хотите выйти?",
+                    fontSize = 16.sp
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        viewModel.onLogout(onLogoutSuccess)
+                    }
+                ) {
+                    Text("Да", color = Color.Black)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showLogoutDialog = false }
+                ) {
+                    Text("Отмена", color = Green)
+                }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(12.dp)
+        )
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -114,7 +168,9 @@ fun SettingScreen(
                 containerColor = Grey,
                 iconBackgroundColor = Blue,
                 colorIcon = Blue,
-                onClick = {}
+                onClick = {
+                    onNavigateToAppSettings()
+                }
             )
             Spacer(modifier = Modifier.height(6.dp))
 
@@ -125,8 +181,7 @@ fun SettingScreen(
                 iconBackgroundColor = Blue,
                 colorIcon = Blue,
                 onClick = {
-                    val url = "https://tajsoft.tj/r_privacy-policy/"
-                    context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                    onPrivacyPolicy()
                 },
             )
         }
@@ -194,7 +249,7 @@ fun SettingScreen(
         if (isAuthenticated) {
             item {
                 Spacer(modifier = Modifier.height(24.dp))
-                LogoutButton(onClick = { viewModel.onLogout(onLogoutSuccess) })
+                LogoutButton(onClick = { showLogoutDialog = true })
             }
         }
         item {
@@ -460,3 +515,182 @@ fun LogoutButton(onClick: () -> Unit) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PushNotification(
+    onBack: () -> Unit,
+    viewModel: SettingViewModel = hiltViewModel()
+) {
+    val state = viewModel.state.collectAsState()
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            viewModel.processCommand(SettingCommand.SetNotificationEnabled(isGranted))
+        }
+    )
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.White,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Настройки",
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+                .fillMaxSize()
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            when (val currentState = state.value) {
+                is SettingState.Configuration -> {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        color = Grey200
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Push уведомления",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+
+                            Switch(
+                                checked = currentState.notificationsEnabled,
+                                onCheckedChange = { enabled ->
+                                    if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                    } else {
+                                        viewModel.processCommand(
+                                            SettingCommand.SetNotificationEnabled(enabled)
+                                        )
+                                    }
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = Green,
+                                    uncheckedThumbColor = Color.White,
+                                ),
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Вы можете управлять разрешениями на уведомления приложений в настройках телефона",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        lineHeight = 18.sp
+                    )
+                }
+                SettingState.Initial -> {}
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PrivacyPolicy(
+    onBack: () -> Unit
+) {
+    var isLoading by remember { mutableStateOf(true) }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.White,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Политика конфиденциальности",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
+        ) {
+            AndroidView(
+                factory = { context ->
+                    WebView(context).apply {
+                        settings.javaScriptEnabled = true
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageStarted(
+                                view: WebView?,
+                                url: String?,
+                                favicon: Bitmap?
+                            ) {
+                                super.onPageStarted(view, url, favicon)
+                                isLoading = true
+                            }
+
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                isLoading = false
+                            }
+                        }
+                        loadUrl("https://tajsoft.tj/r_privacy-policy/")
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(50.dp),
+                    color = Green,
+                    strokeWidth = 4.dp
+                )
+            }
+        }
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.supermarket.data.repository
 
+import android.util.Log
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.ProductApi
 import com.example.supermarket.domain.entity.Product
@@ -16,6 +17,7 @@ class ProductRepositoryImpl @Inject constructor(
             val response = productApi.getWeekSales()
             val domainList = response.map { it.toDomain() }
             emit(domainList)
+            Log.d("ProductRepositoryImpl", "getWeekSales: ${domainList.size}")
         } catch (e: Exception) {
             throw e
         }

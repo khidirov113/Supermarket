@@ -12,6 +12,9 @@ import com.example.supermarket.presentation.screen.home.HomeScreen
 import com.example.supermarket.presentation.screen.home.banner.BannerDetailScreen
 import com.example.supermarket.presentation.screen.home.product.ProductsWeekSaleScreen
 import com.example.supermarket.presentation.screen.map.MapScreen
+import com.example.supermarket.presentation.screen.notification.NotificationScreen
+import com.example.supermarket.presentation.screen.settings.PrivacyPolicy
+import com.example.supermarket.presentation.screen.settings.PushNotification
 import com.example.supermarket.presentation.screen.settings.SettingScreen
 import com.example.supermarket.presentation.screen.settings.auth.AuthScreen
 import com.example.supermarket.presentation.screen.settings.profile.ProfileEditScreen
@@ -34,6 +37,9 @@ fun NavGraph(
                 },
                 onNavigateToAuth = {
                     navController.navigate(Screens.AuthScreen.route)
+                },
+                onNotificationClick = {
+                    navController.navigate(Screens.Notification.route)
                 }
 
             )
@@ -50,7 +56,13 @@ fun NavGraph(
                 }
             )
         }
-
+        composable(
+            route = Screens.PushNotification.route
+        ) {
+            PushNotification(
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable(Screens.Profile.route) {
             ProfileEditScreen(
                 onSaveSuccess = {
@@ -95,9 +107,36 @@ fun NavGraph(
                 onLogoutSuccess = {},
                 onNavigateToAuth = {
                     navController.navigate(Screens.AuthScreen.route)
+                },
+                onPrivacyPolicy = {
+                    navController.navigate(Screens.PrivacyPolicy.route)
+                },
+                onNavigateToAppSettings = {
+                    navController.navigate(Screens.PushNotification.route)
                 }
             )
         }
+        composable(
+            route = Screens.PushNotification.route
+        ) {
+            PushNotification(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screens.Notification.route) {
+            NotificationScreen(
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = Screens.PrivacyPolicy.route
+        ) {
+            PrivacyPolicy(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
 
         composable(
             route = Screens.BannerDetail.route,
@@ -130,8 +169,11 @@ sealed class Screens(val route: String) {
     object ProductWeekSale : Screens("product_week_sale")
     object Notification : Screens("notification")
 
+    object PushNotification : Screens("push_notification")
     object AuthScreen : Screens("auth_screen")
     object Profile : Screens("profile")
     object Catalog : Screens("catalog")
+    object PrivacyPolicy : Screens("privacy_policy")
+
 
 }

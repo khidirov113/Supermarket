@@ -96,7 +96,7 @@ fun ProductDetailSheet(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .background(Grey200, CircleShape)
-                                .size(20.dp)
+                                .size(24.dp)
                         ) {
                             Icon(
                                 Icons.Default.Close,

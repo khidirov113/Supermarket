@@ -3,7 +3,6 @@ package com.example.supermarket.data.remote.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// data/remote/dto/StoreDto.kt
 @Serializable
 data class StoreDto(
     @SerialName("name") val name: String,

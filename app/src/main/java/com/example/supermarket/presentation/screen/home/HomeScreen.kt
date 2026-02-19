@@ -50,6 +50,7 @@ fun HomeScreen(
     onBannerClick: (Long) -> Unit,
     onClickWeekSale: () -> Unit,
     onNavigateToAuth: () -> Unit,
+    onNotificationClick: () -> Unit,
     bannerViewModel: BannerViewModel = hiltViewModel(),
     productViewModel: ProductVewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel()
@@ -77,7 +78,7 @@ fun HomeScreen(
                     }
                 },
                 balance = if (isAuthenticated) balance else null,
-                onNotification = {}
+                onNotification = onNotificationClick
             )
 
             HorizontalDivider(

@@ -3,11 +3,13 @@ package com.example.supermarket.data.mapper
 import com.example.supermarket.data.remote.dto.AccessCodeDto
 import com.example.supermarket.data.remote.dto.BannerDto
 import com.example.supermarket.data.remote.dto.CategoryDto
+import com.example.supermarket.data.remote.dto.NotificationDto
 import com.example.supermarket.data.remote.dto.ProductDto
 import com.example.supermarket.data.remote.dto.StoreDto
 import com.example.supermarket.data.remote.dto.UserProfileDto
 import com.example.supermarket.domain.entity.Banner
 import com.example.supermarket.domain.entity.Category
+import com.example.supermarket.domain.entity.Notification
 import com.example.supermarket.domain.entity.Product
 import com.example.supermarket.domain.entity.QrCodeData
 import com.example.supermarket.domain.entity.Store
@@ -19,6 +21,13 @@ fun BannerDto.toDomain() = Banner(
     title = this.title ?: "",
     image = "https://market.tajsoft.tj/" + this.image,
     description = this.description ?: "",
+)
+fun NotificationDto.toDomain() = Notification(
+    id = id,
+    title = title,
+    description = description?: "",
+    createdAt = createdAt,
+    iconPath = "https://market.tajsoft.tj$iconPath"
 )
 
 

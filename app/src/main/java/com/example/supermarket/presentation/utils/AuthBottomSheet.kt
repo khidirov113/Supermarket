@@ -57,14 +57,13 @@ fun AuthBottomSheet(
                 IconButton(
                     onClick = onDismiss,
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .background(Grey200, CircleShape)
                         .size(32.dp)
+                        .background(Grey200, CircleShape)
                 ) {
                     Icon(
                         Icons.Default.Close,
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(18.dp),
                         tint = Color.Gray
                     )
                 }

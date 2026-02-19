@@ -6,6 +6,7 @@ import com.example.supermarket.data.local.TokenManager
 import com.example.supermarket.data.remote.network.AuthApi
 import com.example.supermarket.data.remote.network.BannerApi
 import com.example.supermarket.data.remote.network.CatalogApiService
+import com.example.supermarket.data.remote.network.NotificationApi
 import com.example.supermarket.data.remote.network.ProductApi
 import com.example.supermarket.data.remote.network.ProfileApi
 import com.example.supermarket.data.remote.network.QrApi
@@ -13,16 +14,20 @@ import com.example.supermarket.data.remote.network.StoreApi
 import com.example.supermarket.data.repository.AuthRepositoryImpl
 import com.example.supermarket.data.repository.BannerRepositoryImpl
 import com.example.supermarket.data.repository.CatalogRepositoryImpl
+import com.example.supermarket.data.repository.NotificationRepositoryImpl
 import com.example.supermarket.data.repository.ProductRepositoryImpl
 import com.example.supermarket.data.repository.ProfileRepositoryImpl
 import com.example.supermarket.data.repository.QrRepositoryImpl
+import com.example.supermarket.data.repository.SettingRepositoryImpl
 import com.example.supermarket.data.repository.StoreRepositoryImpl
 import com.example.supermarket.domain.repository.AuthRepository
 import com.example.supermarket.domain.repository.BannerRepository
 import com.example.supermarket.domain.repository.CatalogRepository
+import com.example.supermarket.domain.repository.NotificationRepository
 import com.example.supermarket.domain.repository.ProductRepository
 import com.example.supermarket.domain.repository.ProfileRepository
 import com.example.supermarket.domain.repository.QrRepository
+import com.example.supermarket.domain.repository.SettingRepository
 import com.example.supermarket.domain.repository.StoreRepository
 import dagger.Binds
 import dagger.Module
@@ -45,13 +50,26 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DataModule {
+interface DataModule {
 
     @Binds
     @Singleton
     abstract fun bindProfileRepository(
         impl: ProfileRepositoryImpl
     ): ProfileRepository
+
+    @Binds
+    @Singleton
+    fun bindNotificationRepository(
+        impl: NotificationRepositoryImpl
+    ): NotificationRepository
+
+    @Binds
+    @Singleton
+    fun bindSettingRepository(
+        impl: SettingRepositoryImpl
+    ): SettingRepository
+
 
     @Binds
     @Singleton
@@ -175,6 +193,11 @@ abstract class DataModule {
         @Provides
         @Singleton
         fun provideAuthApiService(retrofit: Retrofit): AuthApi = retrofit.create()
+
+        @Provides
+        @Singleton
+        fun provideNotificationApiService(retrofit: Retrofit): NotificationApi = retrofit.create()
+
 
         @Provides
         @Singleton

@@ -58,7 +58,13 @@ fun BottomBar(
     val isProductsWeekSale = currentRoute?.startsWith("product_week_sale") == true
     val isAuthScreen = currentRoute?.startsWith("auth_screen") == true
     val isProfile = currentRoute?.startsWith("profile") == true
-    val showBottomBar = !isBannerDetail && !isSearch && !isProductsWeekSale && !isAuthScreen && !isProfile
+    val isPrivacyPolicy = currentRoute?.startsWith("privacy_policy") == true
+    val isNotification = currentRoute == Screens.Notification.route
+    val isPushNotification = currentRoute == Screens.PushNotification.route
+
+    val showBottomBar =
+        !isBannerDetail && !isSearch && !isProductsWeekSale && !isAuthScreen && !isProfile && !isPrivacyPolicy && !isNotification && !isPushNotification
+
 
 
 
