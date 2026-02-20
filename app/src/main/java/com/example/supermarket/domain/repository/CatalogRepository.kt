@@ -3,11 +3,12 @@ package com.example.supermarket.domain.repository
 
 import com.example.supermarket.domain.entity.Category
 import com.example.supermarket.domain.entity.Product
+import kotlinx.coroutines.flow.Flow
 
 interface CatalogRepository {
-    suspend fun getCategories(): Result<List<Category>>
+    suspend fun getCategories(): Flow<List<Category>>
 
-    suspend fun getProductsBySubCategory(subCategoryId: Long): Result<List<Product>>
+    suspend fun getProductsBySubCategory(subCategoryId: Long): Category
 
     suspend fun searchProducts(query: String): Result<List<Product>>
 

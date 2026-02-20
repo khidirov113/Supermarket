@@ -61,11 +61,10 @@ fun BottomBar(
     val isPrivacyPolicy = currentRoute?.startsWith("privacy_policy") == true
     val isNotification = currentRoute == Screens.Notification.route
     val isPushNotification = currentRoute == Screens.PushNotification.route
+    val isCatalogById = currentRoute == Screens.CatalogById.route
 
     val showBottomBar =
-        !isBannerDetail && !isSearch && !isProductsWeekSale && !isAuthScreen && !isProfile && !isPrivacyPolicy && !isNotification && !isPushNotification
-
-
+        !isBannerDetail && !isSearch && !isProductsWeekSale && !isAuthScreen && !isProfile && !isPrivacyPolicy && !isNotification && !isPushNotification && !isCatalogById
 
 
     Scaffold(

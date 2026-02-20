@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.supermarket.presentation.screen.catalog.CatalogByIdScreen
 import com.example.supermarket.presentation.screen.catalog.CatalogScreen
 import com.example.supermarket.presentation.screen.catalog.SearchScreen
 import com.example.supermarket.presentation.screen.home.HomeScreen
@@ -78,12 +79,24 @@ fun NavGraph(
 
         composable(Screens.Catalog.route) {
             CatalogScreen(
-                onCategoryClick = { subCategoryId, title ->
-                    //TODO()
+                onCategoryClick = { id, name ->
+                    navController.navigate("${Screens.CatalogById.route}/$id")
                 },
                 onSearch = {
                     navController.navigate("search")
                 },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = "${Screens.CatalogById.route}/{catalogId}",
+            arguments = listOf(navArgument("catalogId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val catalogId = backStackEntry.arguments?.getLong("catalogId") ?: 0L
+            CatalogByIdScreen(
+                catalogId = catalogId,
                 onBack = {
                     navController.popBackStack()
                 }
@@ -168,7 +181,7 @@ sealed class Screens(val route: String) {
     object BannerDetail : Screens("banner_detail/{bannerId}")
     object ProductWeekSale : Screens("product_week_sale")
     object Notification : Screens("notification")
-
+    object CatalogById : Screens("catalog_by_id")
     object PushNotification : Screens("push_notification")
     object AuthScreen : Screens("auth_screen")
     object Profile : Screens("profile")

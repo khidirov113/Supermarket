@@ -10,7 +10,6 @@ data class UserProfileDto(
     @SerialName("born_in") val bornIn: String? = null,
     @SerialName("gender") val gender: Int? = null,
     @SerialName("image_path") val imagePath: String? = null,
-
     @SerialName("balance") val balance: Double? = null,
     @SerialName("notifications_count") val notificationsCount: Int? = null,
     @SerialName("phone") val phone: String? = null

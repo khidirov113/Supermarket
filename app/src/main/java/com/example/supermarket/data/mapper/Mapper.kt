@@ -6,6 +6,7 @@ import com.example.supermarket.data.remote.dto.CategoryDto
 import com.example.supermarket.data.remote.dto.NotificationDto
 import com.example.supermarket.data.remote.dto.ProductDto
 import com.example.supermarket.data.remote.dto.StoreDto
+import com.example.supermarket.data.remote.dto.SubCategoryDto
 import com.example.supermarket.data.remote.dto.UserProfileDto
 import com.example.supermarket.domain.entity.Banner
 import com.example.supermarket.domain.entity.Category
@@ -13,6 +14,7 @@ import com.example.supermarket.domain.entity.Notification
 import com.example.supermarket.domain.entity.Product
 import com.example.supermarket.domain.entity.QrCodeData
 import com.example.supermarket.domain.entity.Store
+import com.example.supermarket.domain.entity.SubCategory
 import com.example.supermarket.domain.entity.UserProfile
 
 
@@ -22,10 +24,11 @@ fun BannerDto.toDomain() = Banner(
     image = "https://market.tajsoft.tj/" + this.image,
     description = this.description ?: "",
 )
+
 fun NotificationDto.toDomain() = Notification(
     id = id,
     title = title,
-    description = description?: "",
+    description = description ?: "",
     createdAt = createdAt,
     iconPath = "https://market.tajsoft.tj$iconPath"
 )
@@ -50,12 +53,19 @@ fun ProductDto.toDomain(): Product {
     )
 }
 
+fun SubCategoryDto.toDomain() = SubCategory(
+    id = id ?: 0,
+    title = title ?: "",
+    categoryId = categoryId ?: 0,
+    products = products?.map { it.toDomain() } ?: emptyList()
+)
 
 fun CategoryDto.toDomain() = Category(
     id = id,
-    name = name,
-    image = "https://market.tajsoft.tj$image",
-    productsCount = productsCount
+    title = title,
+    image = image?.let { "https://market.tajsoft.tj$it" },
+    productsCount = productsCount,
+    subcategories = subcategories?.map { it.toDomain() } ?: emptyList()
 )
 
 fun UserProfileDto.toDomain(): UserProfile {

@@ -6,37 +6,28 @@ import com.example.supermarket.data.remote.network.CatalogApiService
 import com.example.supermarket.domain.entity.Category
 import com.example.supermarket.domain.entity.Product
 import com.example.supermarket.domain.repository.CatalogRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class CatalogRepositoryImpl @Inject constructor(
     private val apiService: CatalogApiService
 ) : CatalogRepository {
 
-    override suspend fun getCategories(): Result<List<Category>> {
-        return try {
+    override suspend fun getCategories(): Flow<List<Category>> = flow {
+        try {
             val response = apiService.getCategories()
-            if (response.isSuccessful) {
-                Result.success(response.body()?.map { it.toDomain() } ?: emptyList())
-            } else {
-                Result.failure(Exception("Error ${response.code()}"))
-            }
+            val domainList = response.map { it.toDomain() }
+            emit(domainList)
         } catch (e: Exception) {
-            Result.failure(e)
+            throw e
         }
     }
 
-    override suspend fun getProductsBySubCategory(subCategoryId: Long): Result<List<Product>> {
-        return try {
-            val response = apiService.getProductsBySubCategory(subCategoryId)
-            if (response.isSuccessful) {
-                Result.success(response.body()?.map { it.toDomain() } ?: emptyList())
-            } else {
-                Result.failure(Exception("Error ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    override suspend fun getProductsBySubCategory(subCategoryId: Long): Category {
+        return apiService.getCategoryById(subCategoryId).toDomain()
     }
+
 
     override suspend fun searchProducts(query: String): Result<List<Product>> {
         return try {
