@@ -2,19 +2,22 @@ package com.example.supermarket.presentation.screen.notification
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -22,10 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import com.example.supermarket.R
-import com.example.supermarket.domain.entity.Notification
+import com.example.supermarket.domain.value.Notification
+import com.example.supermarket.presentation.component.SupermarketAppBar
+import com.example.supermarket.presentation.screen.banner.BannerDetailScreen
 import com.example.supermarket.presentation.screen.home.HomeViewModel
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.White400
@@ -36,7 +40,8 @@ import com.example.supermarket.presentation.ui.theme.White500
 fun NotificationScreen(
     viewModel: NotificationViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNewsClick: (Long) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -45,26 +50,21 @@ fun NotificationScreen(
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let {
-            Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Не удается подключиться к интернету", Toast.LENGTH_LONG).show()
         }
     }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.White,
         topBar = {
-            TopAppBar(
-                title = { Text(text = "Новости и уведомления", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            SupermarketAppBar(
+                title = "Новости и уведомления",
+                onBack = onBack,
+                scrollBehavior = scrollBehavior
             )
         }
     ) { innerPadding ->
@@ -72,38 +72,45 @@ fun NotificationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color.White)
-        ) {
-            TabRow(
-                selectedTabIndex = selectedTab,
-                containerColor = White400,
+                .padding(horizontal = 10.dp)
+                .background(Color.White),
+
+            ) {
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                indicator = {},
-                divider = {}
+                    .padding(horizontal = 24.dp, vertical = 12.dp)
+                    .fillMaxWidth()
+                    .height(34.dp)
+                    .background(White400, RoundedCornerShape(10.dp))
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 val tabs = listOf("Уведомление", "Новости")
                 tabs.forEachIndexed { index, title ->
                     val isSelected = selectedTab == index
-                    Tab(
-                        selected = isSelected,
-                        onClick = { selectedTab = index },
+
+                    Box(
                         modifier = Modifier
-                            .padding(4.dp)
+                            .weight(1f)
+                            .fillMaxHeight()
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (isSelected) Color.White else Color.Transparent),
-                        text = {
-                            Text(
-                                text = title,
-                                color = if (isSelected) Color.Black else Color.Gray,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        }
-                    )
+                            .background(if (isSelected) Color.White else Color.Transparent)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { selectedTab = index }
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = title,
+                            color = if (isSelected) Color.Black else Color.Gray,
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
-
             if (!isAuthenticated) {
                 EmptyNotificationPlaceholder(isNews = selectedTab == 1)
             } else {
@@ -113,7 +120,8 @@ fun NotificationScreen(
                 NotificationListContent(
                     isLoading = state.isLoading,
                     items = currentList,
-                    isNews = isNewsTab
+                    isNews = isNewsTab,
+                    onNewsClick = onNewsClick
                 )
             }
         }
@@ -124,7 +132,8 @@ fun NotificationScreen(
 fun NotificationListContent(
     isLoading: Boolean,
     items: List<Notification>,
-    isNews: Boolean
+    isNews: Boolean,
+    onNewsClick: (Long) -> Unit
 ) {
     if (isLoading) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -142,7 +151,13 @@ fun NotificationListContent(
         ) {
             if (isNews) {
                 items(items) { item ->
-                    NotificationItem(notification = item, isNews = true)
+                    NotificationItem(
+                        notification = item,
+                        isNews = true,
+                        onClick = {
+                            onNewsClick(item.id.toLong())
+                        }
+                    )
                 }
             } else {
                 val grouped = items.groupBy { it.createdAt.split("T")[0] }
@@ -157,8 +172,7 @@ fun NotificationListContent(
                         )
                     }
                     items(groupedItems) { item ->
-                        NotificationItem(notification = item, isNews = false)
-                    }
+                        NotificationItem(notification = item, isNews = false)                    }
                 }
             }
         }
@@ -166,9 +180,17 @@ fun NotificationListContent(
 }
 
 @Composable
-fun NotificationItem(notification: Notification, isNews: Boolean) {
+fun NotificationItem(
+    notification: Notification,
+    isNews: Boolean,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = White500),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -207,8 +229,8 @@ fun NotificationItem(notification: Notification, isNews: Boolean) {
                 ) {
                     Text(
                         text = notification.title,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
                         color = Color.Black,
                         modifier = Modifier.weight(1f)
                     )
@@ -224,7 +246,8 @@ fun NotificationItem(notification: Notification, isNews: Boolean) {
                         text = formattedDate,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Green,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 12.sp
                     )
                 }
             } else {

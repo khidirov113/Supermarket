@@ -2,7 +2,7 @@ package com.example.supermarket.data.repository
 
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.QrApi
-import com.example.supermarket.domain.entity.QrCodeData
+import com.example.supermarket.domain.value.QrCodeData
 import com.example.supermarket.domain.repository.QrRepository
 import javax.inject.Inject
 

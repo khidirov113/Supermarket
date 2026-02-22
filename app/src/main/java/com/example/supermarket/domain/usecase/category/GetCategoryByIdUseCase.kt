@@ -8,6 +8,6 @@ class GetCategoryByIdUseCase @Inject constructor(
     private val repository: CatalogRepository
 ) {
     suspend operator fun invoke(subCategoryId: Long): Category {
-        return repository.getProductsBySubCategory(subCategoryId)
+        return repository.getCategoryDetail(subCategoryId)
     }
 }

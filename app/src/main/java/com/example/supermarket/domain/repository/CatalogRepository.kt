@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface CatalogRepository {
     suspend fun getCategories(): Flow<List<Category>>
 
-    suspend fun getProductsBySubCategory(subCategoryId: Long): Category
+    suspend fun getCategoryDetail(subCategoryId: Long): Category
 
     suspend fun searchProducts(query: String): Result<List<Product>>
 

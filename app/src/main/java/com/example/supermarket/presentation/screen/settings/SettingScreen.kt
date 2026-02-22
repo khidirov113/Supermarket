@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -68,6 +70,7 @@ import com.example.supermarket.presentation.ui.theme.CustomIcons
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.Grey
 import com.example.supermarket.presentation.ui.theme.Grey200
+import com.example.supermarket.presentation.ui.theme.Grey300
 import com.example.supermarket.presentation.ui.theme.Red
 import com.example.supermarket.presentation.ui.theme.White100
 import com.example.supermarket.presentation.ui.theme.White200
@@ -89,11 +92,9 @@ fun SettingScreen(
     val context = LocalContext.current
 
     var showAuthSheet by remember { mutableStateOf(false) }
-
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     if (showLogoutDialog) {
-
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
             text = {
@@ -123,140 +124,152 @@ fun SettingScreen(
             shape = RoundedCornerShape(12.dp)
         )
     }
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        item {
-            Text(
+
+    Scaffold(
+        containerColor = Color.White,
+        topBar = {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, top = 10.dp, bottom = 10.dp),
-                text = "Настройки",
-                style = MaterialTheme.typography.headlineSmall.copy(
+                    .height(50.dp)
+                    .background(Color.White)
+                    .padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Настройки",
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    style = TextStyle(color = Color.Black)
                 )
-            )
+            }
         }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 20.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
 
-        item {
-            if (isAuthenticated) {
-                ProfileHeaderCard(
-                    name = "${user?.lastName ?: ""} ${user?.firstName ?: ""}".trim(),
-                    phone = "+${user?.phone}",
-                    onClick = onNavigateToEditProfile
-                )
-            } else {
+                if (isAuthenticated) {
+                    ProfileHeaderCard(
+                        name = "${user?.lastName ?: ""} ${user?.firstName ?: ""}".trim(),
+                        phone = "+${user?.phone}",
+                        onClick = onNavigateToEditProfile
+                    )
+                } else {
+                    SettingButton(
+                        text = "Войдите либо \nзарегистрируйтесь",
+                        iconRes = R.drawable.ic_user_round,
+                        containerColor = White100,
+                        iconBackgroundColor = Green,
+                        colorIcon = Green,
+                        onClick = { showAuthSheet = true }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 SettingButton(
-                    text = "Войдите либо \nзарегистрируйтесь",
-                    iconRes = R.drawable.ic_user_round,
-                    containerColor = White100,
-                    iconBackgroundColor = Green,
-                    colorIcon = Green,
-                    onClick = { showAuthSheet = true }
+                    text = "Настройки",
+                    iconRes = R.drawable.ic_settings,
+                    iconBackgroundColor = Blue,
+                    colorIcon = Blue,
+                    onClick = {
+                        onNavigateToAppSettings()
+                    }
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                SettingButton(
+                    text = "Политика конфиденциальности",
+                    iconRes = R.drawable.ic_privacy_tip,
+                    iconBackgroundColor = Blue,
+                    colorIcon = Blue,
+                    onClick = {
+                        onPrivacyPolicy()
+                    },
                 )
             }
 
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(6.dp))
-
-            SettingButton(
-                text = "Настройки",
-                iconRes = R.drawable.ic_settings,
-                containerColor = Grey,
-                iconBackgroundColor = Blue,
-                colorIcon = Blue,
-                onClick = {
-                    onNavigateToAppSettings()
-                }
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-
-            SettingButton(
-                text = "Политика конфиденциальности",
-                iconRes = R.drawable.ic_privacy_tip,
-                containerColor = Grey,
-                iconBackgroundColor = Blue,
-                colorIcon = Blue,
-                onClick = {
-                    onPrivacyPolicy()
-                },
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "ПРИЛОЖЕНИЕ",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray,
-                modifier = Modifier.padding(start = 8.dp, top = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SettingGroup {
-
-                SettingGroupItem(
-                    text = "Поделиться приложением",
-                    iconRes = R.drawable.ic_share,
-                    iconColor = Red,
-                    showDivider = true,
-                    vectorImage = Icons.Default.KeyboardArrowRight,
-                    onClick = {
-                        val url = "https://play.google.com/store/apps/details?id=tj.tajsoft.bonus"
-                        val intent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, url)
-                        }
-                        context.startActivity(intent)
-                    }
-
+                Text(
+                    text = "ПРИЛОЖЕНИЕ",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray,
                 )
-                SettingGroupItem(
-                    text = "Оценить приложение",
-                    iconRes = R.drawable.ic_star,
-                    onClick = {
-                        val url = "https://play.google.com/store/apps/details?id=tj.tajsoft.bonus"
-                        if (url.isNotEmpty()) {
-                            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                Spacer(modifier = Modifier.height(8.dp))
+
+                SettingGroup {
+                    SettingGroupItem(
+                        text = "Поделиться приложением",
+                        iconRes = R.drawable.ic_share,
+                        iconColor = Red,
+                        showDivider = true,
+                        vectorImage = Icons.Default.KeyboardArrowRight,
+                        onClick = {
+                            val url =
+                                "https://play.google.com/store/apps/details?id=tj.tajsoft.bonus"
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, url)
+                            }
                             context.startActivity(intent)
                         }
-                    },
-                    iconColor = Yellow,
-                    showDivider = true,
-                    vectorImage = Icons.Default.KeyboardArrowRight,
-                )
-                SettingGroupItem(
-                    text = "Свяжитесь с разработчиками",
-                    iconRes = R.drawable.ic_messages,
-                    iconColor = Blue,
-                    showDivider = true,
-                    vectorImage = Icons.Default.KeyboardArrowRight
-                )
-                SettingGroupItem(
-                    text = "О приложении",
-                    iconRes = R.drawable.ic_info,
-                    iconColor = Green,
-                    showDivider = false,
-                    vectorImage = null,
-                    versionText = "Версия 1.0.6",
-                )
+                    )
+                    SettingGroupItem(
+                        text = "Оценить приложение",
+                        iconRes = R.drawable.ic_star,
+                        onClick = {
+                            val url =
+                                "https://play.google.com/store/apps/details?id=tj.tajsoft.bonus"
+                            if (url.isNotEmpty()) {
+                                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                                context.startActivity(intent)
+                            }
+                        },
+                        iconColor = Yellow,
+                        showDivider = true,
+                        vectorImage = Icons.Default.KeyboardArrowRight,
+                    )
+                    SettingGroupItem(
+                        text = "Свяжитесь с разработчиками",
+                        iconRes = R.drawable.ic_messages,
+                        iconColor = Blue,
+                        showDivider = true,
+                        vectorImage = Icons.Default.KeyboardArrowRight
+                    )
+                    SettingGroupItem(
+                        text = "О приложении",
+                        iconRes = R.drawable.ic_info,
+                        iconColor = Green,
+                        showDivider = false,
+                        vectorImage = null,
+                        versionText = "Версия 1.0.6",
+                    )
+                }
             }
-        }
-        if (isAuthenticated) {
+
+            if (isAuthenticated) {
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    LogoutButton(onClick = { showLogoutDialog = true })
+                }
+            }
+
             item {
-                Spacer(modifier = Modifier.height(24.dp))
-                LogoutButton(onClick = { showLogoutDialog = true })
+                Spacer(modifier = Modifier.height(16.dp))
+                FooterLink(url = "https://tajsoft.tj/")
+                Spacer(modifier = Modifier.height(5.dp))
             }
-        }
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-            FooterLink(url = "https://tajsoft.tj/")
         }
     }
+
     if (showAuthSheet) {
         AuthBottomSheet(
             onDismiss = { showAuthSheet = false },
@@ -300,9 +313,10 @@ fun FooterLink(
 private fun SettingButton(
     text: String,
     iconRes: Int,
-    containerColor: Color,
+    containerColor: Color = Grey300,
     iconBackgroundColor: Color,
     colorIcon: Color,
+    isIcon: Boolean = true,
     onClick: () -> Unit
 ) {
     Surface(
@@ -346,12 +360,14 @@ private fun SettingButton(
                     color = Color.DarkGray
                 )
             )
-            Icon(
-                imageVector = CustomIcons.ChevronRight,
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier.size(20.dp)
-            )
+            if (isIcon) {
+                Icon(
+                    imageVector = CustomIcons.ChevronRight,
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }
@@ -365,7 +381,7 @@ fun SettingGroup(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = Grey,
+        color = Grey300,
     ) {
         Column(content = content)
     }
@@ -455,7 +471,7 @@ fun ProfileHeaderCard(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(24.dp),
-        color = Grey200,
+        color = Grey300,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
@@ -466,7 +482,7 @@ fun ProfileHeaderCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(54.dp)
+                    .size(50.dp)
                     .clip(CircleShape)
                     .background(Color.White),
                 contentAlignment = Alignment.Center
@@ -474,7 +490,7 @@ fun ProfileHeaderCard(
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
-                    modifier = Modifier.size(30.dp),
+                    modifier = Modifier.size(28.dp),
                     tint = Color.LightGray
                 )
             }
@@ -507,9 +523,9 @@ fun LogoutButton(onClick: () -> Unit) {
     SettingButton(
         text = "Выйти",
         iconRes = R.drawable.ic_logout,
-        containerColor = Grey200,
         iconBackgroundColor = Color.White,
         colorIcon = Red,
+        isIcon = false,
         onClick = onClick
     )
 }
@@ -544,7 +560,7 @@ fun PushNotification(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.vector__stroke_),
                             contentDescription = null,
                             tint = Color.Black
                         )
@@ -643,7 +659,7 @@ fun PrivacyPolicy(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.vector__stroke_),
                             contentDescription = null,
                             tint = Color.Black
                         )

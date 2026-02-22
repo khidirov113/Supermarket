@@ -2,7 +2,7 @@ package com.example.supermarket.presentation.screen.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.supermarket.domain.entity.Notification
+import com.example.supermarket.domain.value.Notification
 import com.example.supermarket.domain.usecase.notification.GetNewsUseCase
 import com.example.supermarket.domain.usecase.notification.GetNotificationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

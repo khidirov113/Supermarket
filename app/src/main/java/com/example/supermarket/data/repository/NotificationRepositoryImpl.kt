@@ -2,7 +2,7 @@ package com.example.supermarket.data.repository
 
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.NotificationApi
-import com.example.supermarket.domain.entity.Notification
+import com.example.supermarket.domain.value.Notification
 import com.example.supermarket.domain.repository.NotificationRepository
 import javax.inject.Inject
 

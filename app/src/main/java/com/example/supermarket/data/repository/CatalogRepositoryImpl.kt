@@ -24,10 +24,9 @@ class CatalogRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getProductsBySubCategory(subCategoryId: Long): Category {
+    override suspend fun getCategoryDetail(subCategoryId: Long): Category {
         return apiService.getCategoryById(subCategoryId).toDomain()
     }
-
 
     override suspend fun searchProducts(query: String): Result<List<Product>> {
         return try {

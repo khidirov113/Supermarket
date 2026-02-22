@@ -17,10 +17,11 @@ interface CatalogApiService {
         @Path("id") id: Long
     ): CategoryDto
 
-    @GET("/api/products/subcategory/{id}")
+    @GET("api/products/subcategory/{subcategory_id}")
     suspend fun getProductsBySubCategory(
-        @Path("id") subcategoryId: Long
+        @Path("subcategory_id") subcategoryId: Long
     ): CategoryDto
+
     @GET("/api/products/search")
     suspend fun searchProducts(
         @Query("q") query: String

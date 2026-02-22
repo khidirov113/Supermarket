@@ -10,12 +10,12 @@ import com.example.supermarket.data.remote.dto.SubCategoryDto
 import com.example.supermarket.data.remote.dto.UserProfileDto
 import com.example.supermarket.domain.entity.Banner
 import com.example.supermarket.domain.entity.Category
-import com.example.supermarket.domain.entity.Notification
+import com.example.supermarket.domain.value.Notification
 import com.example.supermarket.domain.entity.Product
-import com.example.supermarket.domain.entity.QrCodeData
-import com.example.supermarket.domain.entity.Store
+import com.example.supermarket.domain.value.QrCodeData
+import com.example.supermarket.domain.value.Store
 import com.example.supermarket.domain.entity.SubCategory
-import com.example.supermarket.domain.entity.UserProfile
+import com.example.supermarket.domain.value.UserProfile
 
 
 fun BannerDto.toDomain() = Banner(

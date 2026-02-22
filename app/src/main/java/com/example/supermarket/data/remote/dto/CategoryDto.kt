@@ -9,6 +9,7 @@ data class CategoryDto(
     @SerialName("id") val id: Long,
     @SerialName("title") val title: String,
     @SerialName("image_path") val image: String?,
-    @SerialName("products_count") val productsCount: Long,
+    @SerialName("products_count")
+    val productsCount: Long? = null,
     val subcategories: List<SubCategoryDto>? = emptyList()
 )

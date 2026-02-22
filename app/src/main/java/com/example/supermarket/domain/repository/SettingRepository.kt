@@ -1,6 +1,6 @@
 package com.example.supermarket.domain.repository
 
-import com.example.supermarket.domain.entity.Settings
+import com.example.supermarket.domain.value.Settings
 import kotlinx.coroutines.flow.Flow
 
 interface SettingRepository {

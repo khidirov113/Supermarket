@@ -4,7 +4,7 @@ import com.example.supermarket.data.local.TokenManager
 import com.example.supermarket.data.remote.dto.SendCodeRequest
 import com.example.supermarket.data.remote.dto.VerifyCodeRequest
 import com.example.supermarket.data.remote.network.AuthApi
-import com.example.supermarket.domain.entity.AuthResult
+import com.example.supermarket.domain.value.AuthResult
 import com.example.supermarket.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

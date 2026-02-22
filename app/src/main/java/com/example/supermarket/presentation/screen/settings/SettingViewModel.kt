@@ -1,15 +1,12 @@
 package com.example.supermarket.presentation.screen.settings
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.supermarket.data.local.TokenManager
-import com.example.supermarket.domain.entity.AuthResult
-import com.example.supermarket.domain.entity.UserProfile
-import com.example.supermarket.domain.usecase.auth.SendCodeUseCase
+import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.domain.usecase.setting.GetSettingUseCase
 import com.example.supermarket.domain.usecase.setting.UpdateNotificationsEnabledUseCase
 import com.example.supermarket.domain.usecase.user.GetProfileUseCase

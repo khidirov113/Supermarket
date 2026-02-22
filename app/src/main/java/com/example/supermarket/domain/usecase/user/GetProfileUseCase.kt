@@ -1,7 +1,7 @@
 package com.example.supermarket.domain.usecase.user
 
 
-import com.example.supermarket.domain.entity.UserProfile
+import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.domain.repository.ProfileRepository
 import javax.inject.Inject
 

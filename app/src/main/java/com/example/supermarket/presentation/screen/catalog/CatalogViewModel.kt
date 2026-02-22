@@ -1,5 +1,6 @@
 package com.example.supermarket.presentation.screen.catalog
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.supermarket.domain.entity.Category
@@ -38,13 +39,14 @@ class CatalogViewModel @Inject constructor(
     }
 
     fun loadProductsBySubCategory(subCategoryId: Long) {
-        if (_categoryByIdState.value?.id == subCategoryId) return
+        _categoryByIdState.value = null
 
         viewModelScope.launch {
             try {
-                _categoryByIdState.value = getProductsBySubCategoryUseCase(subCategoryId)
+                val result = getProductsBySubCategoryUseCase(subCategoryId)
+                _categoryByIdState.value = result
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.d("CatalogViewModel","$e")
             }
         }
     }

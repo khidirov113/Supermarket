@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.supermarket.domain.entity.Settings
+import com.example.supermarket.domain.value.Settings
 import com.example.supermarket.domain.repository.SettingRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject

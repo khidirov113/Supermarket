@@ -1,18 +1,24 @@
 package com.example.supermarket.presentation.screen.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -28,13 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.supermarket.presentation.screen.home.banner.BannerViewModel
-import com.example.supermarket.presentation.screen.home.product.ProductDetailSheet
-import com.example.supermarket.presentation.screen.home.product.ProductVewModel
-import com.example.supermarket.presentation.screen.home.utils.AppTopBar
-import com.example.supermarket.presentation.screen.home.utils.CardBanner
-import com.example.supermarket.presentation.screen.home.utils.DiscountsWeek
-import com.example.supermarket.presentation.screen.home.utils.ProductCard
+import com.example.supermarket.presentation.screen.cardbanner.BannerViewModel
+import com.example.supermarket.presentation.screen.cardbanner.AppTopBar
+import com.example.supermarket.presentation.screen.cardbanner.CardBanner
+import com.example.supermarket.presentation.screen.cardbanner.DiscountsWeek
+import com.example.supermarket.presentation.screen.cardbanner.ProductCard
+import com.example.supermarket.presentation.screen.product.ProductVewModel
+import com.example.supermarket.presentation.screen.productdelail.ProductDetailSheet
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.White200
 import com.example.supermarket.presentation.utils.AuthBottomSheet
@@ -43,7 +49,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -67,114 +73,126 @@ fun HomeScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
 
-    val state = rememberPullToRefreshState()
+    Scaffold(
+        containerColor = Color.White,
+        topBar = {
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(Color.White),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AppTopBar(
+                    onClickAdd = {
+                        if (!isAuthenticated) {
+                            showAuthSheet = true
+                        }
+                    },
+                    balance = if (isAuthenticated) balance else null,
+                    onNotification = onNotificationClick
+                )
+            }
+        }
+    ) { innerPadding ->
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = modifier.fillMaxSize()) {
-            AppTopBar(
-                onClickAdd = {
-                    if (!isAuthenticated) {
-                        showAuthSheet = true
-                    }
-                },
-                balance = if (isAuthenticated) balance else null,
-                onNotification = onNotificationClick
-            )
-
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 thickness = 0.8.dp,
                 color = White200
             )
 
-            Box(modifier.fillMaxWidth()) {
-                PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    state = state,
-                    onRefresh = {
-                        scope.launch {
-                            isRefreshing = true
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                state = pullToRefreshState,
+                onRefresh = {
+                    scope.launch {
+                        isRefreshing = true
+                        val bannersJob = launch { bannerViewModel.fetchBanners() }
+                        val productsJob = launch { productViewModel.fetchProducts() }
+                        val balanceJob =
+                            launch { if (isAuthenticated) homeViewModel.fetchBalance() }
 
-                            val bannersJob = launch { bannerViewModel.fetchBanners() }
-                            val productsJob = launch { productViewModel.fetchProducts() }
-                            val balanceJob =
-                                launch { if (isAuthenticated) homeViewModel.fetchBalance() }
-
-                            delay(2000)
-
-                            joinAll(bannersJob, productsJob, balanceJob)
-
-                            isRefreshing = false
-                        }
-                    },
-                    indicator = {
-                        PullToRefreshDefaults.Indicator(
-                            state = state,
-                            isRefreshing = isRefreshing,
-                            modifier = Modifier.align(Alignment.TopCenter),
-                            containerColor = Color.White,
-                            color = Green
+                        delay(2000)
+                        joinAll(bannersJob, productsJob, balanceJob)
+                        isRefreshing = false
+                    }
+                },
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        state = pullToRefreshState,
+                        isRefreshing = isRefreshing,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        containerColor = Color.White,
+                        color = Green
+                    )
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item(span = { GridItemSpan(2) }) {
+                        CardBanner(
+                            banners = banners,
+                            onClickBanner = onBannerClick
                         )
                     }
-                ) {
 
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        item(span = { GridItemSpan(2) }) {
-                            CardBanner(
-                                banners = banners,
-                                onClickBanner = onBannerClick
-                            )
-                        }
+                    item(span = { GridItemSpan(2) }) {
+                        DiscountsWeek(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(y = (-15).dp),
+                            onCLickAll = { onClickWeekSale() }
+                        )
+                    }
 
-                        item(span = { GridItemSpan(2) }) {
-                            DiscountsWeek(
-                                modifier = Modifier.fillMaxWidth(),
-                                onCLickAll = { onClickWeekSale() }
-                            )
-                        }
-                        item(span = { GridItemSpan(2) }) {
-                            LazyRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                contentPadding = PaddingValues(horizontal = 8.dp)
-                            ) {
-                                if (products.isEmpty()) {
-                                    items(10) {
-                                        ProductCardShimmer()
-                                    }
-                                } else {
-                                    items(products) { product ->
-                                        ProductCard(
-                                            product = product,
-                                            onClickProduct = { id -> showBottomSheetById = id }
-                                        )
-                                    }
+                    item(span = { GridItemSpan(2) }) {
+                        LazyRow(
+                            modifier = Modifier.offset(y = (-15).dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp)
+                        ) {
+                            if (products.isEmpty()) {
+                                items(10) {
+                                    ProductCardShimmer()
+                                }
+                            } else {
+                                items(products) { product ->
+                                    ProductCard(
+                                        product = product,
+                                        onClickProduct = { id -> showBottomSheetById = id }
+                                    )
                                 }
                             }
                         }
                     }
                 }
-                if (showAuthSheet) {
-                    AuthBottomSheet(
-                        onDismiss = { showAuthSheet = false },
-                        onLoginClick = {
-                            showAuthSheet = false
-                            onNavigateToAuth()
-                        }
-                    )
-                }
-
-                showBottomSheetById?.let { id ->
-                    ProductDetailSheet(
-                        productId = id,
-                        onDismiss = { showBottomSheetById = null }
-                    )
-                }
             }
         }
+    }
+
+    if (showAuthSheet) {
+        AuthBottomSheet(
+            onDismiss = { showAuthSheet = false },
+            onLoginClick = {
+                showAuthSheet = false
+                onNavigateToAuth()
+            }
+        )
+    }
+
+    showBottomSheetById?.let { id ->
+        ProductDetailSheet(
+            productId = id,
+            onDismiss = { showBottomSheetById = null }
+        )
     }
 }

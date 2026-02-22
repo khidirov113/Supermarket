@@ -1,6 +1,6 @@
 package com.example.supermarket.domain.repository
 
-import com.example.supermarket.domain.entity.AuthResult
+import com.example.supermarket.domain.value.AuthResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {

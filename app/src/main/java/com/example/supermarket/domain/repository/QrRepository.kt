@@ -1,6 +1,6 @@
 package com.example.supermarket.domain.repository
 
-import com.example.supermarket.domain.entity.QrCodeData
+import com.example.supermarket.domain.value.QrCodeData
 
 interface QrRepository {
 

@@ -3,7 +3,7 @@ package com.example.supermarket.data.repository
 import com.example.supermarket.data.local.TokenManager
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.ProfileApi
-import com.example.supermarket.domain.entity.UserProfile
+import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.domain.repository.ProfileRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody

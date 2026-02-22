@@ -29,6 +29,7 @@ import com.example.supermarket.domain.repository.ProfileRepository
 import com.example.supermarket.domain.repository.QrRepository
 import com.example.supermarket.domain.repository.SettingRepository
 import com.example.supermarket.domain.repository.StoreRepository
+import com.example.supermarket.domain.usecase.auth.VerifyCodeUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

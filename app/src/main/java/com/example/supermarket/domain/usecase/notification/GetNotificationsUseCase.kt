@@ -1,6 +1,6 @@
 package com.example.supermarket.domain.usecase.notification
 
-import com.example.supermarket.domain.entity.Notification
+import com.example.supermarket.domain.value.Notification
 import com.example.supermarket.domain.repository.NotificationRepository
 import jakarta.inject.Inject
 

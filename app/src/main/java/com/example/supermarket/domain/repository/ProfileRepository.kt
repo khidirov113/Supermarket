@@ -1,6 +1,6 @@
 package com.example.supermarket.domain.repository
 
-import com.example.supermarket.domain.entity.UserProfile
+import com.example.supermarket.domain.value.UserProfile
 
 interface ProfileRepository {
     suspend fun updateProfile(

@@ -22,7 +22,6 @@ class HomeViewModel @Inject constructor(
 
     val isAuthenticated = tokenManager.token
         .map { !it.isNullOrBlank() }
-
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _userBalance = mutableStateOf<String?>(null)
@@ -48,7 +47,7 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure {
                     if (_userBalance.value == null) {
-                        _userBalance.value = "Оффлайн"
+                        _userBalance.value = " "
                     }
                 }
         }

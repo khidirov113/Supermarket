@@ -3,8 +3,8 @@ package com.example.supermarket.presentation.screen.map
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.supermarket.domain.entity.Store
-import com.example.supermarket.domain.usecase.GetStoresUseCase
+import com.example.supermarket.domain.value.Store
+import com.example.supermarket.domain.usecase.qrcode.GetStoresUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
