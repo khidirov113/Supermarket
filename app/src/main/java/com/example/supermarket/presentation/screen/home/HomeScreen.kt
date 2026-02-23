@@ -1,8 +1,8 @@
 package com.example.supermarket.presentation.screen.home
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,6 +23,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.supermarket.presentation.screen.cardbanner.BannerViewModel
@@ -39,7 +41,7 @@ import com.example.supermarket.presentation.screen.cardbanner.AppTopBar
 import com.example.supermarket.presentation.screen.cardbanner.CardBanner
 import com.example.supermarket.presentation.screen.cardbanner.DiscountsWeek
 import com.example.supermarket.presentation.screen.cardbanner.ProductCard
-import com.example.supermarket.presentation.screen.product.ProductVewModel
+import com.example.supermarket.presentation.screen.product.ProductViewModel
 import com.example.supermarket.presentation.screen.productdelail.ProductDetailSheet
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.White200
@@ -58,20 +60,37 @@ fun HomeScreen(
     onNavigateToAuth: () -> Unit,
     onNotificationClick: () -> Unit,
     bannerViewModel: BannerViewModel = hiltViewModel(),
-    productViewModel: ProductVewModel = hiltViewModel(),
+    productViewModel: ProductViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val banners by bannerViewModel.banners.collectAsState()
     val products by productViewModel.products.collectAsState()
     val isAuthenticated by homeViewModel.isAuthenticated.collectAsState()
 
-    var showBottomSheetById by remember { mutableStateOf<Long?>(null) }
     var showAuthSheet by remember { mutableStateOf(false) }
     val balance by homeViewModel.userBalance
 
     var isRefreshing by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
+    val errorMessage by productViewModel.errorMassage.collectAsState()
+    val errorMessageBanner by bannerViewModel.errorMassage.collectAsState()
+
+
+    var showBottomSheetById by remember { mutableStateOf<Long?>(null) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(errorMessage, errorMessageBanner) {
+        errorMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            productViewModel.cleanError()
+        }
+        errorMessageBanner?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            bannerViewModel.cleanError()
+        }
+    }
 
     Scaffold(
         containerColor = Color.White,

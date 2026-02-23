@@ -7,13 +7,9 @@ import jakarta.inject.Inject
 class VerifyCodeUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
-    suspend operator fun invoke(phone: String, code: String): Result<AuthResult> {
-        val result = repository.verifyCode(phone, code)
-
-        result.onSuccess { auth ->
-            auth.token?.let { repository.saveToken(it) }
-        }
-
-        return result
+    suspend operator fun invoke(phone: String, code: String): AuthResult {
+        val auth = repository.verifyCode(phone, code)
+        auth.token?.let { repository.saveToken(it) }
+        return auth
     }
 }

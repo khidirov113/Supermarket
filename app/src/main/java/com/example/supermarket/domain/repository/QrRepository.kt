@@ -4,7 +4,7 @@ import com.example.supermarket.domain.value.QrCodeData
 
 interface QrRepository {
 
-    suspend fun getAccessCode(): Result<QrCodeData>
+    suspend fun getAccessCode(): QrCodeData
 
-    suspend fun verifyAccessCode(code: Int): Result<Unit>
+    suspend fun verifyAccessCode(code: Int)
 }

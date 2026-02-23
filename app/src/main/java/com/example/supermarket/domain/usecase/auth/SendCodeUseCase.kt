@@ -6,5 +6,7 @@ import javax.inject.Inject
 class SendCodeUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
-    suspend operator fun invoke(phone: String) = repository.sendPhone(phone)
+    suspend operator fun invoke(phone: String) {
+        repository.sendPhone(phone)
+    }
 }

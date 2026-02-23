@@ -1,12 +1,14 @@
 package com.example.supermarket.data.repository
 
-import android.util.Log
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.ProductApi
 import com.example.supermarket.domain.entity.Product
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okio.IOException
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
@@ -15,11 +17,11 @@ class ProductRepositoryImpl @Inject constructor(
     override fun getWeekSales(): Flow<List<Product>> = flow {
         try {
             val response = productApi.getWeekSales()
-            val domainList = response.map { it.toDomain() }
-            emit(domainList)
-            Log.d("ProductRepositoryImpl", "getWeekSales: ${domainList.size}")
-        } catch (e: Exception) {
-            throw e
+            emit(response.map { it.toDomain() })
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
+        } catch (e: HttpException) {
+            throw AppException.ServerException(e.code())
         }
     }
 

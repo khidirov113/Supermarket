@@ -21,7 +21,7 @@ data class ProductDto(
     @SerialName("image_path")
     val image: String? = null,
     @SerialName("images")
-    val images: List<ImageRemoteDto>? = null
+    val images: List<ImageRemoteDto>? = null,
 )
 
 @Serializable

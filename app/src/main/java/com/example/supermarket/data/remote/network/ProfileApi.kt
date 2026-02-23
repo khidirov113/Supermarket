@@ -9,7 +9,7 @@ import retrofit2.http.*
 interface ProfileApi {
 
     @GET("/api/user")
-    suspend fun getUser(): Response<UserProfileDto>
+    suspend fun getUser(): UserProfileDto
 
     @Multipart
     @POST("/api/user/update")
@@ -20,8 +20,8 @@ interface ProfileApi {
         @Part("born_in") bornIn: RequestBody?,
         @Part("gender") gender: RequestBody?,
         @Part image: MultipartBody.Part?
-    ): Response<Unit>
+    )
 
     @GET("/api/logout")
-    suspend fun logout(): Response<Unit>
+    suspend fun logout()
 }

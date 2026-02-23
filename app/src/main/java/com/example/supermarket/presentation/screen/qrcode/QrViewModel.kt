@@ -1,16 +1,17 @@
 package com.example.supermarket.presentation.screen.qrcode
 
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.usecase.qrcode.GetQrCodeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 import javax.inject.Inject
 
 data class QrUiState(
@@ -24,16 +25,25 @@ data class QrUiState(
 class QrViewModel @Inject constructor(
     private val getQrCodeUseCase: GetQrCodeUseCase
 ) : ViewModel() {
+
     var uiState by mutableStateOf(QrUiState())
+        private set
+
     private var timerJob: Job? = null
 
     fun loadQrCode() {
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true)
-            getQrCodeUseCase().onSuccess { data ->
+            uiState = uiState.copy(isLoading = true, error = null)
+
+            runCatching {
+                getQrCodeUseCase()
+            }.onSuccess { data ->
                 uiState = uiState.copy(code = data.code, isLoading = false)
                 startTimer(60)
-            }.onFailure { uiState = uiState.copy(isLoading = false) }
+            }.onFailure { exception ->
+                handleException(exception)
+                uiState = uiState.copy(isLoading = false)
+            }
         }
     }
 
@@ -48,5 +58,17 @@ class QrViewModel @Inject constructor(
             }
             loadQrCode()
         }
+    }
+
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is CancellationException -> throw exception
+            is AppException -> uiState = uiState.copy(error = exception.message)
+            else -> uiState = uiState.copy(error = "Ошибка: ${exception.message}")
+        }
+    }
+
+    fun clearError() {
+        uiState = uiState.copy(error = null)
     }
 }

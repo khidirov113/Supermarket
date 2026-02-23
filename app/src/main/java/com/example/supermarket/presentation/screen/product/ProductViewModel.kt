@@ -1,12 +1,11 @@
-package com.example.supermarket.presentation.screen.cardbanner
+package com.example.supermarket.presentation.screen.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.supermarket.domain.entity.Banner
+import com.example.supermarket.domain.entity.Product
 import com.example.supermarket.domain.error.AppException
-import com.example.supermarket.domain.usecase.banner.GetBannersUseCase
+import com.example.supermarket.domain.usecase.product.GetWeekSalesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -14,12 +13,11 @@ import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
-class BannerViewModel @Inject constructor(
-    private val getBannersUseCase: GetBannersUseCase,
+class ProductViewModel @Inject constructor(
+    private val getWeekSalesUseCase: GetWeekSalesUseCase
 ) : ViewModel() {
-
-    private val _banners = MutableStateFlow<List<Banner>>(emptyList())
-    val banners = _banners.asStateFlow()
+    private val _products = MutableStateFlow<List<Product>>(emptyList())
+    val products = _products.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -27,21 +25,20 @@ class BannerViewModel @Inject constructor(
     private val _errorMassage = MutableStateFlow<String?>(null)
     val errorMassage = _errorMassage.asStateFlow()
 
-
     init {
-        fetchBanners()
+        fetchProducts()
     }
 
-    fun fetchBanners() {
+    fun fetchProducts() {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMassage.value = null
             runCatching {
-                getBannersUseCase().collect { bannerList ->
-                    _banners.value = bannerList
+                getWeekSalesUseCase().collect { productList ->
+                    _products.value = productList
                 }
             }.onFailure { exception ->
-                when (exception){
+                when (exception) {
                     is CancellationException -> throw exception
                     is AppException -> _errorMassage.value = exception.message
                     else -> _errorMassage.value = "Unknow error ${exception.message}"
@@ -50,7 +47,9 @@ class BannerViewModel @Inject constructor(
             _isLoading.value = false
         }
     }
-    fun cleanError(){
+
+    fun cleanError() {
         _errorMassage.value = null
     }
+
 }

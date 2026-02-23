@@ -49,12 +49,13 @@ fun NotificationScreen(
     val context = LocalContext.current
 
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let {
-            Toast.makeText(context, "Не удается подключиться к интернету", Toast.LENGTH_LONG).show()
+        state.errorMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
         }
     }
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -172,7 +173,8 @@ fun NotificationListContent(
                         )
                     }
                     items(groupedItems) { item ->
-                        NotificationItem(notification = item, isNews = false)                    }
+                        NotificationItem(notification = item, isNews = false)
+                    }
                 }
             }
         }

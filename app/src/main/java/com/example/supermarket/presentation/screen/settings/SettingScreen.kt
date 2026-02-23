@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -44,6 +45,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -90,10 +92,15 @@ fun SettingScreen(
     val user = viewModel.userData
 
     val context = LocalContext.current
-
     var showAuthSheet by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(viewModel.errorMessage) {
+        viewModel.errorMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
@@ -258,7 +265,9 @@ fun SettingScreen(
             if (isAuthenticated) {
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
-                    LogoutButton(onClick = { showLogoutDialog = true })
+                    LogoutButton(
+                        onClick = { showLogoutDialog = true }
+                    )
                 }
             }
 
@@ -630,6 +639,7 @@ fun PushNotification(
                         lineHeight = 18.sp
                     )
                 }
+
                 SettingState.Initial -> {}
             }
         }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.usecase.auth.SendCodeUseCase
 import com.example.supermarket.domain.usecase.auth.VerifyCodeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -48,12 +50,18 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             isLoading = true
+            errorMessage = null
             val fullPhone = "992$phoneInput"
 
-            sendCodeUseCase(fullPhone).onSuccess {
+            runCatching {
+                sendCodeUseCase(fullPhone)
+            }.onSuccess {
                 step = 2
                 startTimer()
+            }.onFailure { exception ->
+                handleException(exception)
             }
+
             isLoading = false
         }
     }
@@ -63,11 +71,30 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             isLoading = true
+            errorMessage = null
             val fullPhone = "992$phoneInput"
-            verifySmsUseCase(fullPhone, code).onSuccess {
+
+            runCatching {
+                verifySmsUseCase(fullPhone, code)
+            }.onSuccess {
                 onSuccess()
+            }.onFailure { exception ->
+                handleException(exception)
             }
+
             isLoading = false
         }
+    }
+
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is CancellationException -> throw exception
+            is AppException -> errorMessage = exception.message
+            else -> errorMessage = "Error server ${exception.message}"
+        }
+    }
+
+    fun clearError() {
+        errorMessage = null
     }
 }

@@ -17,14 +17,9 @@ interface CatalogApiService {
         @Path("id") id: Long
     ): CategoryDto
 
-    @GET("api/products/subcategory/{subcategory_id}")
-    suspend fun getProductsBySubCategory(
-        @Path("subcategory_id") subcategoryId: Long
-    ): CategoryDto
-
     @GET("/api/products/search")
     suspend fun searchProducts(
         @Query("q") query: String
-    ): Response<SearchResponse>
+    ): SearchResponse
 
 }

@@ -1,5 +1,6 @@
 package com.example.supermarket.presentation.screen.banner
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,11 +43,22 @@ fun BannerDetailScreen(
     onBack: () -> Unit,
     viewModel: BannerDetailViewModel = hiltViewModel()
 ) {
+
+    val banner by viewModel.banner.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMassage.collectAsState()
+
+    val context = LocalContext.current
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { msg ->
+            Toast.makeText(context,msg, Toast.LENGTH_LONG).show()
+            viewModel.cleanError()
+        }
+    }
+
     LaunchedEffect(bannerId) {
         viewModel.loadBannerFromFlow(bannerId)
     }
-
-    val banner by viewModel.banner.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
 

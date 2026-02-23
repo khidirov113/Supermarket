@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetQrCodeUseCase @Inject constructor(
     private val repository: QrRepository
 ) {
-    suspend operator fun invoke(): Result<QrCodeData> {
+    suspend operator fun invoke(): QrCodeData {
         return repository.getAccessCode()
     }
 }

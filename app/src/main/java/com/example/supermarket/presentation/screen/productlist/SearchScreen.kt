@@ -1,5 +1,6 @@
 package com.example.supermarket.presentation.screen.productlist
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,10 +54,20 @@ fun SearchScreen(
 ) {
     val query by viewModel.searchQuery
     val results by viewModel.searchResult
+    val totalCount by viewModel.searchTotal
     val isLoading by viewModel.isLoading
+    val errorMessage by viewModel.errorMessage
 
     var showBottomSheetById by remember { mutableStateOf<Long?>(null) }
 
+    val context = LocalContext.current
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
     Scaffold(
         containerColor = Grey200,
         modifier = Modifier.fillMaxSize(),
@@ -82,10 +95,9 @@ fun SearchScreen(
                         strokeWidth = 3.dp
                     )
                 }
-            }
-            else if (results.isNotEmpty()) {
+            } else if (results.isNotEmpty()) {
                 Text(
-                    text = "Найден ${results.size} товар",
+                    text = "Найден $totalCount товар",
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     color = Color.Gray,
                     fontSize = 14.sp

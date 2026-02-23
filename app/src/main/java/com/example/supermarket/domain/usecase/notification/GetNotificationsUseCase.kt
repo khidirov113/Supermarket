@@ -7,5 +7,7 @@ import jakarta.inject.Inject
 class GetNotificationsUseCase @Inject constructor(
     private val repository: NotificationRepository
 ) {
-    suspend operator fun invoke(): Result<List<Notification>> = repository.getNotifications()
+    suspend operator fun invoke(): List<Notification> {
+        return repository.getNotifications()
+    }
 }

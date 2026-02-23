@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -39,17 +40,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-     fun fetchBalance() {
+    fun fetchBalance() {
         viewModelScope.launch {
-            getProfileUseCase()
-                .onSuccess { user ->
-                    _userBalance.value = "${user.bonus ?: 0.0} бон."
+            _userBalance.value = null
+
+            runCatching {
+                getProfileUseCase()
+            }.onSuccess { user ->
+                _userBalance.value = "${user.bonus ?: 0.0} бон."
+            }.onFailure { exception ->
+                if (exception !is CancellationException) {
+                    _userBalance.value = " "
                 }
-                .onFailure {
-                    if (_userBalance.value == null) {
-                        _userBalance.value = " "
-                    }
-                }
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.supermarket.presentation.screen.map
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,14 @@ fun MapScreen(
     val context = LocalContext.current
     val stores by viewModel.stores.collectAsState()
     val isLoading by viewModel.isLoading
+
+    val errorMessage by viewModel.errorMessage
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
 
     LaunchedEffect(Unit) {
         Configuration.getInstance().load(

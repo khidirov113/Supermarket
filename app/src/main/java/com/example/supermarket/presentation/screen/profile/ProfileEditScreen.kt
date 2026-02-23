@@ -1,5 +1,6 @@
 package com.example.supermarket.presentation.screen.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -68,6 +70,14 @@ fun ProfileEditScreen(
     val title = if (viewModel.uiState.name.isEmpty()) "Добавить данные" else "Редактировать профиль"
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    LaunchedEffect(viewModel.uiState.errorMessage) {
+        viewModel.uiState.errorMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
 
     LaunchedEffect(viewModel.uiState.isSuccess) {
         if (viewModel.uiState.isSuccess) onSaveSuccess()

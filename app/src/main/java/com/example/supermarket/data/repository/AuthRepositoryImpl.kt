@@ -4,9 +4,12 @@ import com.example.supermarket.data.local.TokenManager
 import com.example.supermarket.data.remote.dto.SendCodeRequest
 import com.example.supermarket.data.remote.dto.VerifyCodeRequest
 import com.example.supermarket.data.remote.network.AuthApi
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.value.AuthResult
 import com.example.supermarket.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -17,42 +20,53 @@ class AuthRepositoryImpl @Inject constructor(
 
     override val token: Flow<String?> = tokenManager.token
 
-    override suspend fun sendPhone(phone: String): Result<Unit> {
-        return try {
+    override suspend fun sendPhone(phone: String) {
+        try {
             val cleanPhone = phone.replace("+", "")
+            authApi.sendCode(SendCodeRequest(cleanPhone))
 
-            val response = authApi.sendCode(SendCodeRequest(cleanPhone))
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
 
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                val errorJson = response.errorBody()?.string()
-                Result.failure(Exception("Ошибка валидации: $errorJson"))
+        } catch (e: HttpException) {
+            when (e.code()) {
+                422 -> {
+                    throw AppException.InvalidPhoneException()
+                }
+                400, 404 -> {
+                    throw AppException.InvalidPhoneException()
+                }
+                429 -> {
+                    throw AppException.TooManyRequestsException()
+                }
+                else -> {
+                    throw AppException.ServerException(e.code())
+                }
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            throw AppException.UnknownException()
         }
     }
 
-    override suspend fun verifyCode(phone: String, code: String): Result<AuthResult> {
+    override suspend fun verifyCode(phone: String, code: String): AuthResult {
         return try {
             val response = authApi.verifyCode(VerifyCodeRequest(phone, code))
-            val body = response.body()
+            val finalToken = response.token ?: response.accessToken ?: ""
 
-            if (response.isSuccessful && body != null) {
-                val finalToken = body.token ?: body.accessToken
-
-                Result.success(
-                    AuthResult(
-                        token = finalToken,
-                        message = body.message
-                    )
-                )
+            AuthResult(
+                token = finalToken,
+                message = response.message
+            )
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
+        } catch (e: HttpException) {
+            if (e.code() == 422 || e.code() == 400) {
+                throw AppException.InvalidCodeException()
             } else {
-                Result.failure(Exception("Error body is null"))
+                throw AppException.ServerException(e.code())
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            throw AppException.UnknownException()
         }
     }
 

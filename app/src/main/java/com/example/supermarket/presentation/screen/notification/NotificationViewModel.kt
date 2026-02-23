@@ -2,6 +2,7 @@ package com.example.supermarket.presentation.screen.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.value.Notification
 import com.example.supermarket.domain.usecase.notification.GetNewsUseCase
 import com.example.supermarket.domain.usecase.notification.GetNotificationsUseCase
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 import javax.inject.Inject
 
 data class NotificationState(
@@ -36,26 +38,45 @@ class NotificationViewModel @Inject constructor(
     fun loadNotifications() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            getNotificationsUseCase()
-                .onSuccess { data ->
-                    _state.update { it.copy(isLoading = false, notifications = data) }
-                }
-                .onFailure { error ->
-                    _state.update { it.copy(isLoading = false, errorMessage = error.message) }
-                }
+
+            runCatching {
+                getNotificationsUseCase()
+            }.onSuccess { data ->
+                _state.update { it.copy(isLoading = false, notifications = data) }
+            }.onFailure { exception ->
+                handleException(exception)
+            }
         }
     }
 
     fun loadNews() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            getNewsUseCase()
-                .onSuccess { data ->
-                    _state.update { it.copy(isLoading = false, news = data) }
-                }
-                .onFailure { error ->
-                    _state.update { it.copy(isLoading = false, errorMessage = error.message) }
-                }
+
+            runCatching {
+                getNewsUseCase()
+            }.onSuccess { data ->
+                _state.update { it.copy(isLoading = false, news = data) }
+            }.onFailure { exception ->
+                handleException(exception)
+            }
         }
+    }
+
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is CancellationException -> throw exception
+            is AppException -> _state.update {
+                it.copy(isLoading = false, errorMessage = exception.message)
+            }
+
+            else -> _state.update {
+                it.copy(isLoading = false, errorMessage = "Ошибка: ${exception.message}")
+            }
+        }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(errorMessage = null) }
     }
 }

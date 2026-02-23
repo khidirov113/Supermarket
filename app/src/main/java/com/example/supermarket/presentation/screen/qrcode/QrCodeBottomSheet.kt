@@ -1,5 +1,6 @@
 package com.example.supermarket.presentation.screen.qrcode
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -44,6 +46,14 @@ fun QrCodeBottomSheet(
 ) {
     val uiState = viewModel.uiState
     val qrBitmap = remember(uiState.code) { uiState.code?.let { generateQrCode(it) } }
+
+    val context = LocalContext.current
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
 
     LaunchedEffect(Unit) { viewModel.loadQrCode() }
 

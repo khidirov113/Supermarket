@@ -7,10 +7,10 @@ import retrofit2.http.POST
 
 interface QrApi {
     @POST("/api/access-code")
-    suspend fun getAccessCode(): Response<AccessCodeDto>
+    suspend fun getAccessCode(): AccessCodeDto
 
     @POST("/api/access-code-verify")
     suspend fun verifyAccessCode(
         @Body request: Map<String, Int>
-    ): Response<Unit>
+    )
 }

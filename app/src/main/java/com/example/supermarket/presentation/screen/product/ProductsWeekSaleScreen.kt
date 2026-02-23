@@ -1,5 +1,6 @@
 package com.example.supermarket.presentation.screen.product
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -37,12 +40,23 @@ fun ProductsWeekSaleScreen(
     modifier: Modifier = Modifier,
     onProductClick: (Long) -> Unit,
     onBack: () -> Unit,
-    viewModel: ProductVewModel = hiltViewModel()
+    viewModel: ProductViewModel = hiltViewModel()
 ) {
 
     val products by viewModel.products.collectAsState()
-    val isLoading = products.isEmpty()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMassage.collectAsState()
+
     var showBottomSheetById by remember { mutableStateOf<Long?>(null) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            viewModel.cleanError()
+        }
+    }
 
     Scaffold(
         modifier = modifier

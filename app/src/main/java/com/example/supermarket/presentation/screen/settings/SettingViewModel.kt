@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.supermarket.data.local.TokenManager
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.domain.usecase.setting.GetSettingUseCase
 import com.example.supermarket.domain.usecase.setting.UpdateNotificationsEnabledUseCase
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
@@ -33,17 +35,27 @@ class SettingViewModel @Inject constructor(
     val isAuthenticated = tokenManager.token.map { !it.isNullOrBlank() }
 
     var userData by mutableStateOf<UserProfile?>(null)
-    private val _state = MutableStateFlow<SettingState>(SettingState.Initial)
+        private set
+
+    private val _state = MutableStateFlow<SettingState>(SettingState.Configuration(false))
     val state = _state.asStateFlow()
+
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+    var isLoading by mutableStateOf(false)
+        private set
 
     init {
         viewModelScope.launch {
             isAuthenticated.collect { auth ->
                 if (auth) {
                     fetchProfile()
+                } else {
+                    userData = null
                 }
             }
         }
+
         getSettingUseCase()
             .onEach { settings ->
                 _state.update {
@@ -54,18 +66,36 @@ class SettingViewModel @Inject constructor(
 
     private fun fetchProfile() {
         viewModelScope.launch {
-            getProfileUseCase().onSuccess { profile ->
+            isLoading = true
+            errorMessage = null
+            runCatching {
+                getProfileUseCase()
+            }.onSuccess { profile ->
                 userData = profile
+            }.onFailure { exception ->
+                handleException(exception)
             }
+
+            isLoading = false
         }
     }
 
     fun onLogout(onSuccess: () -> Unit) {
         viewModelScope.launch {
-            logoutUseCase().onSuccess {
+            isLoading = true
+            errorMessage = null
+
+            // ТЎҒИРЛАНДИ: runCatching га ўтказилди
+            runCatching {
+                logoutUseCase()
+            }.onSuccess {
                 userData = null
                 onSuccess()
+            }.onFailure { exception ->
+                handleException(exception)
             }
+
+            isLoading = false
         }
     }
 
@@ -78,6 +108,17 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    private fun handleException(exception: Throwable) {
+        when (exception) {
+            is CancellationException -> throw exception
+            is AppException -> errorMessage = exception.message
+            else -> errorMessage = "Ошибка: ${exception.message}"
+        }
+    }
+
+    fun clearError() {
+        errorMessage = null
+    }
 }
 
 sealed interface SettingCommand {

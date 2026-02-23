@@ -2,8 +2,11 @@ package com.example.supermarket.data.repository
 
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.QrApi
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.value.QrCodeData
 import com.example.supermarket.domain.repository.QrRepository
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class QrRepositoryImpl @Inject constructor(
@@ -11,27 +14,27 @@ class QrRepositoryImpl @Inject constructor(
 ) : QrRepository {
 
 
-    override suspend fun getAccessCode(): Result<QrCodeData> {
+    override suspend fun getAccessCode(): QrCodeData {
         return try {
-            val response = api.getAccessCode()
-            if (response.isSuccessful && response.body() != null) {
-                val data = response.body()!!.toDomain()
-                Result.success(data)
-            } else {
-                Result.failure(Exception("Error get"))
-            }
+            api.getAccessCode().toDomain()
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
+        } catch (e: HttpException) {
+            throw AppException.ServerException(e.code())
         } catch (e: Exception) {
-            Result.failure(e)
+            throw AppException.UnknownException()
         }
     }
 
-    override suspend fun verifyAccessCode(code: Int): Result<Unit> {
-        return try {
-            val response = api.verifyAccessCode(mapOf("code" to code))
-            if (response.isSuccessful) Result.success(Unit)
-            else Result.failure(Exception("Error verify"))
+    override suspend fun verifyAccessCode(code: Int) {
+        try {
+            api.verifyAccessCode(mapOf("code" to code))
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
+        } catch (e: HttpException) {
+            throw AppException.ServerException(e.code())
         } catch (e: Exception) {
-            Result.failure(e)
+            throw AppException.UnknownException()
         }
     }
 }

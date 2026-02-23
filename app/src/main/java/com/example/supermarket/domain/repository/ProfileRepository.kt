@@ -9,9 +9,9 @@ interface ProfileRepository {
         bornIn: String?,
         gender: Int?,
         imagePath: String?
-    ): Result<Unit>
+    )
 
-    suspend fun logout(): Result<Unit>
+    suspend fun logout()
 
-    suspend fun getUserProfile(): Result<UserProfile>
+    suspend fun getUserProfile(): UserProfile
 }

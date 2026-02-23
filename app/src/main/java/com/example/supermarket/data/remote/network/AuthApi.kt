@@ -11,8 +11,8 @@ import retrofit2.http.POST
 
 interface AuthApi {
     @POST("/api/send-code")
-    suspend fun sendCode(@Body request: SendCodeRequest): Response<Unit>
+    suspend fun sendCode(@Body request: SendCodeRequest)
 
     @POST("/api/verify-code")
-    suspend fun verifyCode(@Body request: VerifyCodeRequest): Response<AuthResponse>
+    suspend fun verifyCode(@Body request: VerifyCodeRequest): AuthResponse
 }

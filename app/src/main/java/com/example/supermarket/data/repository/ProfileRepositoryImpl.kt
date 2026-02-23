@@ -3,13 +3,16 @@ package com.example.supermarket.data.repository
 import com.example.supermarket.data.local.TokenManager
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.ProfileApi
+import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.domain.repository.ProfileRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -18,18 +21,16 @@ class ProfileRepositoryImpl @Inject constructor(
 ) : ProfileRepository {
 
 
-    override suspend fun getUserProfile(): Result<UserProfile> {
+    override suspend fun getUserProfile(): UserProfile {
         return try {
             val response = api.getUser()
-            if (response.isSuccessful && response.body() != null) {
-                val user = response.body()!!.toDomain()
-                Result.success(user)
-            } else {
-                Result.failure(Exception("Error"))
-            }
+            response.toDomain()
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
+        } catch (e: HttpException) {
+            throw AppException.ServerException(e.code())
         } catch (e: Exception) {
-            Result.failure(e)
-
+            throw AppException.UnknownException()
         }
     }
 
@@ -39,8 +40,8 @@ class ProfileRepositoryImpl @Inject constructor(
         bornIn: String?,
         gender: Int?,
         imagePath: String?
-    ): Result<Unit> {
-        return try {
+    ) {
+        try {
             val methodPart = "PATCH".toRequestBody("text/plain".toMediaTypeOrNull())
             val namePart = name?.toRequestBody("text/plain".toMediaTypeOrNull())
             val surnamePart = surname?.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -52,40 +53,30 @@ class ProfileRepositoryImpl @Inject constructor(
                 if (file.exists()) {
                     val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
                     MultipartBody.Part.createFormData("image", file.name, requestFile)
-                } else {
-                    null
-                }
+                } else null
             }
-            val response = api.updateProfile(
-                methodPart,
-                namePart,
-                surnamePart,
-                bornInPart,
-                genderPart,
-                imagePart
-            )
 
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Error"))
-            }
+            api.updateProfile(methodPart, namePart, surnamePart, bornInPart, genderPart, imagePart)
+
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
+        } catch (e: HttpException) {
+            throw AppException.ServerException(e.code())
         } catch (e: Exception) {
-            Result.failure(e)
+            throw AppException.UnknownException()
         }
     }
 
-    override suspend fun logout(): Result<Unit> {
-        return try {
-            val response = api.logout()
-            if (response.isSuccessful) {
-                dataStoreManager.saveToken("")
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Logout Error"))
-            }
+    override suspend fun logout() {
+        try {
+            api.logout()
+            dataStoreManager.saveToken("")
+        } catch (e: IOException) {
+            throw AppException.NetworkException()
+        } catch (e: HttpException) {
+            throw AppException.ServerException(e.code())
         } catch (e: Exception) {
-            Result.failure(e)
+            throw AppException.UnknownException()
         }
     }
 }
