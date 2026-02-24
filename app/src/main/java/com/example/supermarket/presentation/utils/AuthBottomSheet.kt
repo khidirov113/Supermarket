@@ -56,7 +56,7 @@ fun AuthBottomSheet(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.End) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 IconButton(
                     onClick = onDismiss,
                     modifier = Modifier
@@ -71,7 +71,7 @@ fun AuthBottomSheet(
                     )
                 }
             }
-
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Выполните вход в систему",
                 fontSize = 18.sp,
