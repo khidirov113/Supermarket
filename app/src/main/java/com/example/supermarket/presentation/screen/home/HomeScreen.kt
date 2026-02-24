@@ -177,7 +177,7 @@ fun HomeScreen(
                         LazyRow(
                             modifier = Modifier.offset(y = (-15).dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = PaddingValues(horizontal = 8.dp)
+                            contentPadding = PaddingValues(horizontal = 20.dp)
                         ) {
                             if (products.isEmpty()) {
                                 items(10) {

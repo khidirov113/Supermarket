@@ -1,9 +1,9 @@
 package com.example.supermarket.domain.repository
 
 
+import androidx.paging.PagingData
 import com.example.supermarket.domain.entity.Category
 import com.example.supermarket.domain.entity.Product
-import com.example.supermarket.domain.entity.SearchProductsResult
 import kotlinx.coroutines.flow.Flow
 
 interface CatalogRepository {
@@ -11,6 +11,5 @@ interface CatalogRepository {
 
     suspend fun getCategoryDetail(subCategoryId: Long): Category
 
-    suspend fun searchProducts(query: String): SearchProductsResult
-
+    fun searchProducts(query: String, onTotalCount: (Int) -> Unit): Flow<PagingData<Product>>
 }

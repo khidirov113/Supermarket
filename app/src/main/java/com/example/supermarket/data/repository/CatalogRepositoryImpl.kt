@@ -1,11 +1,13 @@
 package com.example.supermarket.data.repository
 
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.supermarket.data.mapper.toDomain
 import com.example.supermarket.data.remote.network.CatalogApiService
 import com.example.supermarket.domain.entity.Category
 import com.example.supermarket.domain.entity.Product
-import com.example.supermarket.domain.entity.SearchProductsResult
 import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.repository.CatalogRepository
 import kotlinx.coroutines.flow.Flow
@@ -40,18 +42,17 @@ class CatalogRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchProducts(query: String): SearchProductsResult {
-        return try {
-            val response = apiService.searchProducts(query)
-            SearchProductsResult(
-                products = response.products.map { it.toDomain() },
-                total = response.total
-            )
-        } catch (e: IOException) {
-            throw AppException.NetworkException()
-        } catch (e: HttpException) {
-            throw AppException.ServerException(e.code())
-        }
+    override fun searchProducts(
+        query: String,
+        onTotalCount: (Int) -> Unit
+    ): Flow<PagingData<Product>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { SearchPagingSource(apiService, query, onTotalCount) }
+        ).flow
     }
 }
 

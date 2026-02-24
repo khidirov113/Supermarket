@@ -1,5 +1,6 @@
 package com.example.supermarket.presentation.screen.productlist
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,9 +12,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -39,6 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.supermarket.presentation.screen.cardbanner.ProductCard
 import com.example.supermarket.presentation.screen.productdelail.ProductDetailSheet
 import com.example.supermarket.presentation.ui.theme.Black
@@ -53,19 +57,19 @@ fun SearchScreen(
     onProductClick: (Long) -> Unit,
 ) {
     val query by viewModel.searchQuery
-    val results by viewModel.searchResult
     val totalCount by viewModel.searchTotal
-    val isLoading by viewModel.isLoading
-    val errorMessage by viewModel.errorMessage
+
+    val results = viewModel.searchResult.collectAsLazyPagingItems()
 
     var showBottomSheetById by remember { mutableStateOf<Long?>(null) }
-
     val context = LocalContext.current
 
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let { msg ->
+    val errorState = results.loadState.refresh as? LoadState.Error
+        ?: results.loadState.append as? LoadState.Error
+
+    LaunchedEffect(errorState) {
+        errorState?.error?.message?.let { msg ->
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            viewModel.clearError()
         }
     }
     Scaffold(
@@ -85,17 +89,11 @@ fun SearchScreen(
                 .padding(innerPadding)
                 .background(White)
         ) {
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = Green,
-                        strokeWidth = 3.dp
-                    )
+            if (results.loadState.refresh is LoadState.Loading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Green, strokeWidth = 3.dp)
                 }
-            } else if (results.isNotEmpty()) {
+            } else if (results.itemCount > 0) {
                 Text(
                     text = "Найден $totalCount товар",
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -110,14 +108,32 @@ fun SearchScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(results) { product ->
-                        ProductCard(
-                            product = product,
-                            onClickProduct = { id -> showBottomSheetById = id }
-                        )
+                    items(results.itemCount) { index ->
+                        results[index]?.let { product ->
+                            ProductCard(
+                                product = product,
+                                onClickProduct = { id -> showBottomSheetById = id }
+                            )
+                        }
+                    }
+
+                    if (results.loadState.append is LoadState.Loading) {
+                        item(span = { GridItemSpan(2) }) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    color = Green,
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
+                        }
                     }
                 }
-            } else if (query.isNotEmpty()) {
+            } else if (results.loadState.refresh is LoadState.NotLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = "По данному запросу ничего не найдено",

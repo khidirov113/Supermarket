@@ -19,7 +19,8 @@ interface CatalogApiService {
 
     @GET("/api/products/search")
     suspend fun searchProducts(
-        @Query("q") query: String
+        @Query("q") query: String,
+        @Query("page") page: Int
     ): SearchResponse
 
 }

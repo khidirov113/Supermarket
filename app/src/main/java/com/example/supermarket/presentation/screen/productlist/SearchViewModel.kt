@@ -4,12 +4,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.supermarket.domain.entity.Product
-import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.usecase.category.SearchProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.coroutines.cancellation.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,56 +23,38 @@ class SearchViewModel @Inject constructor(
 
     private val _searchQuery = mutableStateOf("")
     val searchQuery: State<String> = _searchQuery
-
-    private val _searchResult = mutableStateOf<List<Product>>(emptyList())
-    val searchResult: State<List<Product>> = _searchResult
+    private val _searchResult = MutableStateFlow<PagingData<Product>>(PagingData.empty())
+    val searchResult: StateFlow<PagingData<Product>> = _searchResult.asStateFlow()
 
     private val _searchTotal = mutableStateOf(0)
     val searchTotal: State<Int> = _searchTotal
 
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: State<Boolean> = _isLoading
-
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
+    private var searchJob: Job? = null
 
     fun onQueryChange(newQuery: String) {
         _searchQuery.value = newQuery
         if (newQuery.isEmpty()) {
-            _searchResult.value = emptyList()
+            searchJob?.cancel()
+            _searchResult.value = PagingData.empty()
             _searchTotal.value = 0
-            _isLoading.value = false
         } else {
             searchProducts()
         }
     }
 
-    fun searchProducts() {
+    private fun searchProducts() {
         val currentQuery = searchQuery.value
         if (currentQuery.isEmpty()) return
 
-        viewModelScope.launch {
-            _isLoading.value = true
-            _errorMessage.value = null
-
-            runCatching {
-                searchProductsUseCase(currentQuery)
-            }.onSuccess { data ->
-                _searchResult.value = data.products
-                _searchTotal.value = data.total
-            }.onFailure { exception ->
-                when (exception) {
-                    is CancellationException -> throw exception
-                    is AppException -> _errorMessage.value = exception.message
-                    else -> _errorMessage.value = ": ${exception.message}"
-                }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            searchProductsUseCase(currentQuery) { total ->
+                _searchTotal.value = total
             }
-
-            _isLoading.value = false
+                .cachedIn(viewModelScope)
+                .collect { pagingData ->
+                    _searchResult.value = pagingData
+                }
         }
-    }
-
-    fun clearError() {
-        _errorMessage.value = null
     }
 }

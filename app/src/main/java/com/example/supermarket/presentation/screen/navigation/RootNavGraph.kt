@@ -2,6 +2,7 @@ package com.example.supermarket.presentation.screen.navigation
 
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,13 +10,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.supermarket.presentation.screen.auth.AuthScreen
 import com.example.supermarket.presentation.screen.banner.BannerDetailScreen
-import com.example.supermarket.presentation.screen.productlist.CatalogByIdScreen
-import com.example.supermarket.presentation.screen.productlist.SearchScreen
 import com.example.supermarket.presentation.screen.notification.NotificationScreen
 import com.example.supermarket.presentation.screen.product.ProductsWeekSaleScreen
+import com.example.supermarket.presentation.screen.productlist.CatalogByIdScreen
+import com.example.supermarket.presentation.screen.productlist.SearchScreen
 import com.example.supermarket.presentation.screen.profile.ProfileEditScreen
 import com.example.supermarket.presentation.screen.settings.PrivacyPolicy
 import com.example.supermarket.presentation.screen.settings.PushNotification
+
+fun NavHostController.safePopBackStack() {
+    if (currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+        popBackStack()
+    }
+}
 
 @Composable
 fun RootNavGraph(
@@ -37,12 +44,12 @@ fun RootNavGraph(
                         popUpTo(Screens.AuthScreen.route) { inclusive = true }
                     }
                 },
-                onBack = { rootNavController.popBackStack() }
+                onBack = { rootNavController.safePopBackStack() }
             )
         }
 
         composable(route = Screens.PushNotification.route) {
-            PushNotification(onBack = { rootNavController.popBackStack() })
+            PushNotification(onBack = { rootNavController.safePopBackStack() })
         }
 
         composable(Screens.Profile.route) {
@@ -52,7 +59,7 @@ fun RootNavGraph(
                         popUpTo(Screens.Profile.route) { inclusive = true }
                     }
                 },
-                onNavigateBack = { rootNavController.popBackStack() }
+                onNavigateBack = { rootNavController.safePopBackStack() }
             )
         }
 
@@ -63,13 +70,13 @@ fun RootNavGraph(
             val catalogId = backStackEntry.arguments?.getLong("catalogId") ?: 0L
             CatalogByIdScreen(
                 catalogId = catalogId,
-                onBack = { rootNavController.popBackStack() }
+                onBack = { rootNavController.safePopBackStack() }
             )
         }
 
         composable(Screens.Search.route) {
             SearchScreen(
-                onBack = { rootNavController.popBackStack() },
+                onBack = { rootNavController.safePopBackStack() },
                 onProductClick = { productId ->
                     rootNavController.navigate("product_detail/$productId")
                 }
@@ -78,7 +85,7 @@ fun RootNavGraph(
 
         composable(Screens.Notification.route) {
             NotificationScreen(
-                onBack = { rootNavController.popBackStack() },
+                onBack = { rootNavController.safePopBackStack() },
                 onNewsClick = { bannerId ->
                     rootNavController.navigate(
                         Screens.BannerDetail.route.replace("{bannerId}", bannerId.toString())
@@ -88,7 +95,7 @@ fun RootNavGraph(
         }
 
         composable(Screens.PrivacyPolicy.route) {
-            PrivacyPolicy(onBack = { rootNavController.popBackStack() })
+            PrivacyPolicy(onBack = { rootNavController.safePopBackStack() })
         }
 
         composable(
@@ -98,7 +105,7 @@ fun RootNavGraph(
             val bannerId = backStackEntry.arguments?.getLong("bannerId") ?: 0L
             BannerDetailScreen(
                 bannerId = bannerId,
-                onBack = { rootNavController.popBackStack() }
+                onBack = { rootNavController.safePopBackStack() }
             )
         }
 
@@ -107,7 +114,7 @@ fun RootNavGraph(
                 onProductClick = { productId ->
                     rootNavController.navigate("product_detail/$productId")
                 },
-                onBack = { rootNavController.popBackStack() }
+                onBack = { rootNavController.safePopBackStack() }
             )
         }
     }
