@@ -11,12 +11,14 @@ import androidx.navigation.navArgument
 import com.example.supermarket.presentation.screen.auth.AuthScreen
 import com.example.supermarket.presentation.screen.banner.BannerDetailScreen
 import com.example.supermarket.presentation.screen.notification.NotificationScreen
+import com.example.supermarket.presentation.screen.onboarding.OnboardingScreen
 import com.example.supermarket.presentation.screen.product.ProductsWeekSaleScreen
 import com.example.supermarket.presentation.screen.productlist.CatalogByIdScreen
 import com.example.supermarket.presentation.screen.productlist.SearchScreen
 import com.example.supermarket.presentation.screen.profile.ProfileEditScreen
 import com.example.supermarket.presentation.screen.settings.PrivacyPolicy
 import com.example.supermarket.presentation.screen.settings.PushNotification
+import com.example.supermarket.presentation.screen.transaction.TransactionHistoryScreen
 
 fun NavHostController.safePopBackStack() {
     if (currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
@@ -26,12 +28,17 @@ fun NavHostController.safePopBackStack() {
 
 @Composable
 fun RootNavGraph(
-    rootNavController: NavHostController
+    rootNavController: NavHostController,
+    startDestination: String
 ) {
     NavHost(
         navController = rootNavController,
-        startDestination = Screens.MainFlow.route
+        startDestination = startDestination
     ) {
+
+        composable("onboarding_screen") {
+            OnboardingScreen(navController = rootNavController)
+        }
 
         composable(Screens.MainFlow.route) {
             MainScreen(rootNavController = rootNavController)
@@ -82,7 +89,11 @@ fun RootNavGraph(
                 }
             )
         }
-
+        composable(Screens.TransactionHistory.route) {
+            TransactionHistoryScreen(
+                onBack = { rootNavController.safePopBackStack() }
+            )
+        }
         composable(Screens.Notification.route) {
             NotificationScreen(
                 onBack = { rootNavController.safePopBackStack() },

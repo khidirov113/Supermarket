@@ -1,6 +1,5 @@
 package com.example.supermarket.presentation.screen.auth
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -33,13 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +46,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.Grey100
 import com.example.supermarket.presentation.ui.theme.Grey200
+import com.example.supermarket.presentation.utils.PhoneVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,14 +55,6 @@ fun AuthScreen(
     onBack: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-
-    LaunchedEffect(viewModel.errorMessage) {
-        viewModel.errorMessage?.let { msg ->
-            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            viewModel.clearError()
-        }
-    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -120,17 +110,36 @@ fun ColumnScope.PhoneInputStep(viewModel: AuthViewModel) {
 
     OutlinedTextField(
         value = viewModel.phoneInput,
-        onValueChange = {
-            if (it.length <= 9) viewModel.phoneInput = it
+        onValueChange = { newValue ->
+            viewModel.clearError()
+            val digitsOnly = newValue.filter { it.isDigit() }
+            if (digitsOnly.length <= 9) {
+                viewModel.phoneInput = digitsOnly
+            }
         },
+        visualTransformation = remember { PhoneVisualTransformation() },
         modifier = Modifier.fillMaxWidth(),
         prefix = { Text("+992 ", color = Color.Black, fontWeight = FontWeight.Medium) },
         shape = RoundedCornerShape(16.dp),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        isError = viewModel.errorMessage != null,
+        supportingText = {
+            if (viewModel.errorMessage != null) {
+                Text(
+                    text = viewModel.errorMessage ?: "Пользователя с таким номером телефона не существует",
+                    color = Color.Red,
+                    fontSize = 12.sp
+                )
+            }
+        },
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Grey100,
             cursorColor = Green,
-            unfocusedBorderColor = Grey100
+            unfocusedBorderColor = Grey100,
+            errorBorderColor = Color.Red,
+            errorCursorColor = Color.Red,
+            errorPrefixColor = Color.Black,
+            errorSupportingTextColor = Color.Red
         )
     )
 
@@ -228,13 +237,21 @@ fun ColumnScope.OtpInputStep(viewModel: AuthViewModel, onAuthSuccess: () -> Unit
             onValueChange = {
                 if (it.length <= 4) {
                     viewModel.code = it
-                    viewModel.errorMessage = null
+                    viewModel.clearError()
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .fillMaxWidth()
                 .alpha(0f)
+        )
+    }
+    if (viewModel.errorMessage != null) {
+        Text(
+            text = viewModel.errorMessage ?: "",
+            color = Color.Red,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(top = 16.dp)
         )
     }
 

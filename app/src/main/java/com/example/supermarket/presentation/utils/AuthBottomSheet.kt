@@ -2,6 +2,7 @@ package com.example.supermarket.presentation.utils
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,18 +57,22 @@ fun AuthBottomSheet(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                IconButton(
-                    onClick = onDismiss,
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Box(
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(28.dp)
                         .background(Grey200, CircleShape)
+                        .clickable { onDismiss() },
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.Close,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.Gray
+                        contentDescription = "Close",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }

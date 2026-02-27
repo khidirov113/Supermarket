@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -47,10 +48,9 @@ import com.example.supermarket.presentation.utils.AuthBottomSheet
 
 @Composable
 fun MainScreen(
-    rootNavController: NavHostController, // Асосий навигация учун
+    rootNavController: NavHostController,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-    // ИЧКИ навигация (Фақат 4 та Bottom таблар учун)
     val bottomNavController = rememberNavController()
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -67,7 +67,10 @@ fun MainScreen(
                 },
                 containerColor = Green,
                 shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 5.dp,
+                    pressedElevation = 8.dp
+                ),
                 modifier = Modifier.offset(y = 80.dp),
             ) {
                 Icon(
@@ -111,7 +114,8 @@ fun MainScreen(
                         },
                         onClickWeekSale = { rootNavController.navigate(Screens.ProductWeekSale.route) },
                         onNavigateToAuth = { rootNavController.navigate(Screens.AuthScreen.route) },
-                        onNotificationClick = { rootNavController.navigate(Screens.Notification.route) }
+                        onNotificationClick = { rootNavController.navigate(Screens.Notification.route) },
+                        onHistoryClick = { rootNavController.navigate(Screens.TransactionHistory.route) }
                     )
                 }
 

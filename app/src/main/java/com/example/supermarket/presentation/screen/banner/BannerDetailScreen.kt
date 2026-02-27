@@ -89,7 +89,7 @@ fun BannerDetailScreen(
                                 )
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.vector__stroke_),
+                                painter = painterResource(id = R.drawable.ic_vector_stroke),
                                 contentDescription = "Back",
                                 tint = Color.Unspecified
                             )
@@ -128,7 +128,7 @@ fun BannerDetailScreen(
                     .align(Alignment.TopStart)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.vector__stroke_),
+                    painter = painterResource(id = R.drawable.ic_vector_stroke),
                     contentDescription = "Back",
                     tint = Color.Black
                 )

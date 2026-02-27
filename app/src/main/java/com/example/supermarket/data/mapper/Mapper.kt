@@ -16,7 +16,10 @@ import com.example.supermarket.domain.value.QrCodeData
 import com.example.supermarket.domain.value.Store
 import com.example.supermarket.domain.entity.SubCategory
 import com.example.supermarket.domain.value.UserProfile
-
+import com.example.supermarket.data.remote.dto.TransactionDto
+import com.example.supermarket.domain.value.Transaction
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 fun BannerDto.toDomain() = Banner(
     id = this.id,
@@ -88,9 +91,50 @@ fun AccessCodeDto.toDomain(): QrCodeData {
 }
 
 
-fun StoreDto.toDomain() = Store(
-    name = name,
-    latitude = lat,
-    longitude = lng,
-    address = address ?: ""
-)
+fun StoreDto.toDomain(): Store {
+    val formatTime: (String?) -> String = { time ->
+        if (time != null && time.length >= 5) time.substring(0, 5) else ""
+    }
+
+    return Store(
+        id = this.id,
+        title = this.title,
+        latitude = this.latitude.toDoubleOrNull() ?: 0.0,
+        longitude = this.longitude.toDoubleOrNull() ?: 0.0,
+        address = this.address ?: "Не указан",
+        fromTime = formatTime(this.fromTime),
+        toTime = formatTime(this.toTime),
+        images = this.images ?: emptyList()
+    )
+}
+
+fun TransactionDto.toDomain(): Transaction {
+    var formattedDate = ""
+    var formattedTime = ""
+
+    try {
+        if (!this.createdAt.isNullOrEmpty()) {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val dateObj = inputFormat.parse(this.createdAt.substringBefore("."))
+            if (dateObj != null) {
+                formattedDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(dateObj)
+                formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(dateObj)
+            }
+        }
+    } catch (e: Exception) {
+        formattedDate = this.createdAt?.substringBefore("T") ?: ""
+        formattedTime = this.createdAt?.substringAfter("T")?.substringBefore(".") ?: ""
+    }
+
+    val isDeposit = this.type == "deposit" || (this.amount ?: 0.0) > 0
+
+    return Transaction(
+        id = this.id,
+        title = this.title ?: if (isDeposit) "Начисление" else "Снятие",
+        bonusAmount = this.amount ?: 0.0,
+        price = this.price ?: 0.0,
+        date = formattedDate,
+        time = formattedTime,
+        isPositive = isDeposit
+    )
+}

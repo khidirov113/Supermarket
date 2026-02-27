@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,15 +37,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.supermarket.presentation.screen.cardbanner.BannerViewModel
 import com.example.supermarket.presentation.screen.cardbanner.AppTopBar
+import com.example.supermarket.presentation.screen.cardbanner.BannerViewModel
 import com.example.supermarket.presentation.screen.cardbanner.CardBanner
 import com.example.supermarket.presentation.screen.cardbanner.DiscountsWeek
 import com.example.supermarket.presentation.screen.cardbanner.ProductCard
 import com.example.supermarket.presentation.screen.product.ProductViewModel
 import com.example.supermarket.presentation.screen.productdelail.ProductDetailSheet
+import com.example.supermarket.presentation.screen.transaction.AllTransaction
+import com.example.supermarket.presentation.screen.transaction.TransactionItemCard
+import com.example.supermarket.presentation.screen.transaction.TransactionViewModel
 import com.example.supermarket.presentation.ui.theme.Green
-import com.example.supermarket.presentation.ui.theme.White200
+import com.example.supermarket.presentation.ui.theme.White300
 import com.example.supermarket.presentation.utils.AuthBottomSheet
 import com.example.supermarket.presentation.utils.ProductCardShimmer
 import kotlinx.coroutines.delay
@@ -59,13 +63,16 @@ fun HomeScreen(
     onClickWeekSale: () -> Unit,
     onNavigateToAuth: () -> Unit,
     onNotificationClick: () -> Unit,
+    onHistoryClick: () -> Unit,
     bannerViewModel: BannerViewModel = hiltViewModel(),
     productViewModel: ProductViewModel = hiltViewModel(),
+    transactionViewModel: TransactionViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val banners by bannerViewModel.banners.collectAsState()
     val products by productViewModel.products.collectAsState()
     val isAuthenticated by homeViewModel.isAuthenticated.collectAsState()
+    val transactionState by transactionViewModel.state.collectAsState()
 
     var showAuthSheet by remember { mutableStateOf(false) }
     val balance by homeViewModel.userBalance
@@ -95,7 +102,7 @@ fun HomeScreen(
     Scaffold(
         containerColor = Color.White,
         topBar = {
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -108,8 +115,10 @@ fun HomeScreen(
                             showAuthSheet = true
                         }
                     },
-                    balance = if (isAuthenticated) balance else null,
-                    onNotification = onNotificationClick
+                    balance = balance,
+                    isAuthenticated = isAuthenticated,
+                    onNotification = onNotificationClick,
+                    onHistoryClick = onHistoryClick
                 )
             }
         }
@@ -123,7 +132,7 @@ fun HomeScreen(
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 thickness = 0.8.dp,
-                color = White200
+                color = White300
             )
 
             PullToRefreshBox(
@@ -168,7 +177,7 @@ fun HomeScreen(
                         DiscountsWeek(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(y = (-15).dp),
+                                .offset(y = (-10).dp),
                             onCLickAll = { onClickWeekSale() }
                         )
                     }
@@ -176,8 +185,8 @@ fun HomeScreen(
                     item(span = { GridItemSpan(2) }) {
                         LazyRow(
                             modifier = Modifier.offset(y = (-15).dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = PaddingValues(horizontal = 20.dp)
+                            horizontalArrangement = Arrangement.spacedBy(1.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp)
                         ) {
                             if (products.isEmpty()) {
                                 items(10) {
@@ -190,6 +199,38 @@ fun HomeScreen(
                                         onClickProduct = { id -> showBottomSheetById = id }
                                     )
                                 }
+                            }
+                        }
+                    }
+                    item(span = { GridItemSpan(2) }) {
+                        if (isAuthenticated) {
+                            AllTransaction(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .offset(y = (-10).dp),
+                                onCLickAll = onHistoryClick,
+                            )
+                        }
+                    }
+
+                    item(span = { GridItemSpan(2) }) {
+                        if (isAuthenticated) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                if (transactionState.isLoading || transactionState.purchases.isEmpty()) {
+                                    repeat(4) {
+                                    }
+                                } else {
+                                    transactionState.purchases.take(4).forEach { transaction ->
+                                        TransactionItemCard(transaction = transaction)
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
                     }

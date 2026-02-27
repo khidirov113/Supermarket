@@ -11,9 +11,11 @@ import com.example.supermarket.data.remote.network.ProductApi
 import com.example.supermarket.data.remote.network.ProfileApi
 import com.example.supermarket.data.remote.network.QrApi
 import com.example.supermarket.data.remote.network.StoreApi
+import com.example.supermarket.data.remote.network.TransactionApi
 import com.example.supermarket.data.repository.AuthRepositoryImpl
 import com.example.supermarket.data.repository.BannerRepositoryImpl
 import com.example.supermarket.data.repository.CatalogRepositoryImpl
+import com.example.supermarket.data.repository.FakeTransactionRepositoryImpl
 import com.example.supermarket.data.repository.NotificationRepositoryImpl
 import com.example.supermarket.data.repository.ProductRepositoryImpl
 import com.example.supermarket.data.repository.ProfileRepositoryImpl
@@ -29,7 +31,7 @@ import com.example.supermarket.domain.repository.ProfileRepository
 import com.example.supermarket.domain.repository.QrRepository
 import com.example.supermarket.domain.repository.SettingRepository
 import com.example.supermarket.domain.repository.StoreRepository
-import com.example.supermarket.domain.usecase.auth.VerifyCodeUseCase
+import com.example.supermarket.domain.repository.TransactionRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -55,9 +57,15 @@ interface DataModule {
 
     @Binds
     @Singleton
-    abstract fun bindProfileRepository(
+    fun bindProfileRepository(
         impl: ProfileRepositoryImpl
     ): ProfileRepository
+
+    @Binds
+    @Singleton
+    fun bindTransactionRepository(
+        impl: FakeTransactionRepositoryImpl
+    ): TransactionRepository
 
     @Binds
     @Singleton
@@ -199,6 +207,9 @@ interface DataModule {
         @Singleton
         fun provideNotificationApiService(retrofit: Retrofit): NotificationApi = retrofit.create()
 
+        @Provides
+        @Singleton
+        fun providesTransactionApiService(retrofit: Retrofit): TransactionApi = retrofit.create()
 
         @Provides
         @Singleton

@@ -2,6 +2,7 @@ package com.example.supermarket.presentation.screen.productdelail
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,18 +92,19 @@ fun ProductDetailSheet(
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        IconButton(
-                            onClick = onDismiss,
+                        Box(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
+                                .size(28.dp)
                                 .background(Grey200, CircleShape)
-                                .size(24.dp)
+                                .clickable { onDismiss() },
+                            contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = null,
+                                contentDescription = "Close",
                                 tint = Color.Gray,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
                         }
                     }

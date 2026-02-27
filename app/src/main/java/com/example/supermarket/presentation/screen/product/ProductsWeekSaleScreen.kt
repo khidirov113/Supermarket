@@ -72,7 +72,7 @@ fun ProductsWeekSaleScreen(
                             .clickable {
                                 onBack()
                             },
-                        painter = painterResource(id = R.drawable.vector__stroke_),
+                        painter = painterResource(id = R.drawable.ic_vector_stroke),
                         contentDescription = "Back",
                         tint = Color.Unspecified
                     )

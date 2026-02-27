@@ -1,6 +1,8 @@
 package com.example.supermarket.presentation.screen.map
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,8 +31,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.supermarket.R
+import com.example.supermarket.domain.value.Store
 import com.example.supermarket.presentation.ui.theme.Green
+import com.example.supermarket.presentation.utils.StoreDetailsBottomSheet
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -42,6 +51,8 @@ fun MapScreen(
     val context = LocalContext.current
     val stores by viewModel.stores.collectAsState()
     val isLoading by viewModel.isLoading
+
+    var selectedStore by remember { mutableStateOf<Store?>(null) }
 
     val errorMessage by viewModel.errorMessage
     LaunchedEffect(errorMessage) {
@@ -102,9 +113,18 @@ fun MapScreen(
                     stores.forEach { store ->
                         val marker = Marker(mapView)
                         marker.position = GeoPoint(store.latitude, store.longitude)
-                        marker.title = store.name
+                        marker.title = store.title
                         marker.snippet = store.address
                         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        marker.icon = ContextCompat.getDrawable(
+                            context,
+                            R.drawable.ic_marker
+                        )
+                        marker.setOnMarkerClickListener { _, _ ->
+                            selectedStore = store
+                            true
+                        }
+
                         mapView.overlays.add(marker)
                     }
                     mapView.invalidate()
@@ -118,5 +138,18 @@ fun MapScreen(
                 )
             }
         }
+    }
+
+    selectedStore?.let { store ->
+        StoreDetailsBottomSheet(
+            store = store,
+            onDismiss = { selectedStore = null },
+            onRouteClick = {
+                val uri =
+                    Uri.parse("geo:${store.latitude},${store.longitude}?q=${store.latitude},${store.longitude}(${store.title})")
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                context.startActivity(intent)
+            }
+        )
     }
 }

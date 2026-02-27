@@ -25,10 +25,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,7 +68,6 @@ import com.example.supermarket.R
 import com.example.supermarket.presentation.ui.theme.Blue
 import com.example.supermarket.presentation.ui.theme.CustomIcons
 import com.example.supermarket.presentation.ui.theme.Green
-import com.example.supermarket.presentation.ui.theme.Grey
 import com.example.supermarket.presentation.ui.theme.Grey200
 import com.example.supermarket.presentation.ui.theme.Grey300
 import com.example.supermarket.presentation.ui.theme.Red
@@ -159,7 +156,7 @@ fun SettingScreen(
                 .padding(horizontal = 20.dp)
         ) {
             item {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 if (isAuthenticated) {
                     ProfileHeaderCard(
@@ -178,7 +175,7 @@ fun SettingScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 SettingButton(
                     text = "Настройки",
@@ -189,7 +186,7 @@ fun SettingScreen(
                         onNavigateToAppSettings()
                     }
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 SettingButton(
                     text = "Политика конфиденциальности",
@@ -203,7 +200,7 @@ fun SettingScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = "ПРИЛОЖЕНИЕ",
@@ -330,7 +327,7 @@ private fun SettingButton(
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(16.dp),
         color = containerColor,
         modifier = Modifier
             .fillMaxWidth()
@@ -339,12 +336,13 @@ private fun SettingButton(
     ) {
         Row(
             modifier = Modifier
-                .padding(12.dp),
+                .padding(12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
                 color = iconBackgroundColor,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.size(30.dp)
             ) {
                 Box(
@@ -364,10 +362,9 @@ private fun SettingButton(
                 modifier = Modifier
                     .padding(start = 12.dp)
                     .weight(1f),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Medium,
-                    color = Color.DarkGray
-                )
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Black,
+                lineHeight = 14.sp
             )
             if (isIcon) {
                 Icon(
@@ -389,7 +386,7 @@ fun SettingGroup(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         color = Grey300,
     ) {
         Column(content = content)
@@ -412,7 +409,7 @@ fun SettingGroupItem(
     }) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(12.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -569,7 +566,7 @@ fun PushNotification(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            painter = painterResource(id = R.drawable.vector__stroke_),
+                            painter = painterResource(id = R.drawable.ic_vector_stroke),
                             contentDescription = null,
                             tint = Color.Black
                         )
@@ -669,7 +666,7 @@ fun PrivacyPolicy(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            painter = painterResource(id = R.drawable.vector__stroke_),
+                            painter = painterResource(id = R.drawable.ic_vector_stroke),
                             contentDescription = null,
                             tint = Color.Black
                         )

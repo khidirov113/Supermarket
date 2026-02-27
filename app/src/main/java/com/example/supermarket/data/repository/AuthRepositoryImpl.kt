@@ -33,12 +33,15 @@ class AuthRepositoryImpl @Inject constructor(
                 422 -> {
                     throw AppException.InvalidPhoneException()
                 }
+
                 400, 404 -> {
                     throw AppException.InvalidPhoneException()
                 }
+
                 429 -> {
                     throw AppException.TooManyRequestsException()
                 }
+
                 else -> {
                     throw AppException.ServerException(e.code())
                 }

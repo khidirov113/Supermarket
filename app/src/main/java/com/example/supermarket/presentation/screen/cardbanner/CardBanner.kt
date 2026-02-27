@@ -60,47 +60,78 @@ fun AppTopBar(
     modifier: Modifier = Modifier,
     onClickAdd: () -> Unit,
     onNotification: () -> Unit,
-    balance: String?
+    onHistoryClick: () -> Unit,
+    balance: String?,
+    isAuthenticated: Boolean
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Box(modifier = Modifier.weight(1f)) {
-            if (balance != null) {
-                Text(
-                    text = balance,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Green,
-                    letterSpacing = 0.5.sp
-                )
+            if (isAuthenticated) {
+                if (balance != null) {
+                    Text(
+                        text = balance,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Green,
+                        letterSpacing = 0.5.sp
+                    )
+                }
             } else {
-                Text(
-                    text = stringResource(R.string.create_system),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Green,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable { onClickAdd() }
-                )
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.create_system),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Green
+                    )
+
+                    Spacer(modifier = Modifier.width(3.dp))
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_vector_system),
+                        contentDescription = null,
+                        tint = Green,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
             }
         }
 
-        Icon(
-            painter = painterResource(R.drawable.ic_notification),
-            contentDescription = stringResource(R.string.notification),
-            modifier = Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-                .clickable { onNotification() },
-            tint = Color.Black
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(R.drawable.ic_notification),
+                contentDescription = stringResource(R.string.notification),
+                modifier = Modifier
+                    .size(18.dp)
+                    .clip(CircleShape)
+                    .clickable { onNotification() },
+                tint = Color.Black
+            )
+
+            if (isAuthenticated) {
+                Spacer(modifier = Modifier.width(16.dp))
+                Icon(
+                    painter = painterResource(R.drawable.ic_bonus),
+                    contentDescription = "History",
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .clickable { onHistoryClick() },
+                    tint = Color.Black
+                )
+            }
+        }
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -119,16 +150,14 @@ fun CardBanner(
             verticalArrangement = Arrangement.Top
         ) {
             Box(
-
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-
             ) {
                 HorizontalPager(
                     state = pagerState,
-                    contentPadding = PaddingValues(horizontal = 32.dp),
-                    pageSpacing = 16.dp,
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    pageSpacing = 12.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
@@ -138,14 +167,14 @@ fun CardBanner(
                     val currentBanner = banners[page]
 
                     Card(
-                        shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
                             .fillMaxSize()
-                            .clickable { onClickBanner(currentBanner.id) }
                             .graphicsLayer {
                                 val pageOffset = (
                                         (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
                                         ).absoluteValue
+
                                 val scale = lerp(
                                     start = 0.85f,
                                     stop = 1f,
@@ -188,7 +217,7 @@ fun CardBanner(
                         val width = if (isSelected) 16.dp else 8.dp
                         Box(
                             modifier = Modifier
-                                .padding(3.dp)
+                                .padding(4.dp)
                                 .clip(CircleShape)
                                 .background(color)
                                 .height(6.dp)
@@ -214,7 +243,7 @@ fun DiscountsWeek(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, top = 12.dp, bottom = 4.dp, end = 12.dp),
+                .padding(start = 20.dp, top = 8.dp, end = 6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -251,7 +280,7 @@ fun ProductCard(
             .padding(4.dp)
             .width(110.dp)
             .clickable { onClickProduct(product.id) },
-        shadowElevation = 2.dp,
+        shadowElevation = 4.dp,
         color = Color.White,
         shape = RoundedCornerShape(20.dp),
     ) {

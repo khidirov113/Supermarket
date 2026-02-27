@@ -21,8 +21,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -102,7 +100,7 @@ fun CatalogByIdScreen(
                         }
                     }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.vector__stroke_),
+                            painter = painterResource(id = R.drawable.ic_vector_stroke),
                             contentDescription = "Back",
                             tint = Color.Black
                         )

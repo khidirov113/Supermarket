@@ -1,8 +1,6 @@
-package com.example.supermarket.presentation.component
+package com.example.supermarket.presentation.screen.navigation
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,7 +41,7 @@ fun SupermarketAppBar(
             if (onBack != null) {
                 IconButton(onClick = onBack) {
                     Icon(
-                        painter = painterResource(id = R.drawable.vector__stroke_),
+                        painter = painterResource(id = R.drawable.ic_vector_stroke),
                         contentDescription = "back",
                         tint = Color.Black
                     )

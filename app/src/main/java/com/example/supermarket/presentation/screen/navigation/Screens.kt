@@ -1,8 +1,9 @@
 package com.example.supermarket.presentation.screen.navigation
 
 sealed class Screens(val route: String) {
-    data object MainFlow : Screens("main_flow") // ЯНГИ: Асосий 4 та таблар оқими
+    data object MainFlow : Screens("main_flow")
     data object Home : Screens("home")
+    data object TransactionHistory : Screens("transaction_history")
     data object Catalog : Screens("catalog")
     data object Map : Screens("map")
     data object Settings : Screens("settings")
