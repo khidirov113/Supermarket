@@ -1,6 +1,8 @@
 package com.example.supermarket.presentation.screen.notification
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -35,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,13 +55,20 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.SubcomposeAsyncImage
 import com.example.supermarket.R
 import com.example.supermarket.domain.value.Notification
+import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.presentation.screen.home.HomeViewModel
 import com.example.supermarket.presentation.screen.navigation.SupermarketAppBar
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.White400
 import com.example.supermarket.presentation.ui.theme.White500
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun NotificationScreen(
     viewModel: NotificationViewModel = hiltViewModel(),
@@ -73,10 +83,30 @@ fun NotificationScreen(
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let { msg ->
-            if (isAuthenticated) {
+            if (isAuthenticated == true) {
                 Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
             }
             viewModel.clearError()
+        }
+    }
+
+    if (isAuthenticated == true) {
+        val openDialog = remember { mutableStateOf(false) }
+        val notificationPermissionState =
+            rememberPermissionState(permission = android.Manifest.permission.POST_NOTIFICATIONS)
+
+        if (openDialog.value) {
+            RequestNotificationPermissionDialog(
+                openDialog = openDialog,
+                permissionState = notificationPermissionState
+            )
+        }
+
+        LaunchedEffect(key1 = Unit) {
+            if (notificationPermissionState.status.isGranted || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                Firebase.messaging.subscribeToTopic("Tutorial")
+            } else openDialog.value = true
+
         }
     }
 
@@ -100,7 +130,7 @@ fun NotificationScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 10.dp)
                 .background(Color.White),
-            ) {
+        ) {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 24.dp, vertical = 12.dp)
@@ -136,7 +166,7 @@ fun NotificationScreen(
                     }
                 }
             }
-            if (!isAuthenticated) {
+            if (isAuthenticated == false) {
                 EmptyNotificationPlaceholder(isNews = selectedTab == 1)
             } else {
                 val currentList = if (selectedTab == 0) state.notifications else state.news

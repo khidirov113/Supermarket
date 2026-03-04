@@ -1,6 +1,8 @@
 package com.example.supermarket.presentation.screen.navigation
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
@@ -8,6 +10,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.supermarket.presentation.screen.about.AboutScreen
 import com.example.supermarket.presentation.screen.auth.AuthScreen
 import com.example.supermarket.presentation.screen.banner.BannerDetailScreen
 import com.example.supermarket.presentation.screen.notification.NotificationScreen
@@ -26,6 +29,7 @@ fun NavHostController.safePopBackStack() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun RootNavGraph(
     rootNavController: NavHostController,
@@ -42,6 +46,11 @@ fun RootNavGraph(
 
         composable(Screens.MainFlow.route) {
             MainScreen(rootNavController = rootNavController)
+        }
+        composable(Screens.About.route){
+            AboutScreen(
+                onBackClick = {rootNavController.safePopBackStack()}
+            )
         }
 
         composable(Screens.AuthScreen.route) {

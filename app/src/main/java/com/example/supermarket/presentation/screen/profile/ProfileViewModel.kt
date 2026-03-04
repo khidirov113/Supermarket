@@ -1,5 +1,7 @@
 package com.example.supermarket.presentation.screen.profile
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,11 +9,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.supermarket.domain.error.AppException
 import com.example.supermarket.domain.usecase.user.GetProfileUseCase
-import com.example.supermarket.domain.usecase.user.LogoutUseCase
 import com.example.supermarket.domain.usecase.user.UpdateProfileUseCase
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 import kotlin.coroutines.cancellation.CancellationException
 
 data class ProfileUiState(
@@ -19,6 +23,7 @@ data class ProfileUiState(
     val surname: String = "",
     val bornIn: String = "",
     val gender: Int = 1,
+    val selectedImageUri: Uri? = null,
     val imagePath: String? = null,
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
@@ -28,7 +33,6 @@ data class ProfileUiState(
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val updateProfileUseCase: UpdateProfileUseCase,
-    private val logoutUseCase: LogoutUseCase,
     private val getProfileUseCase: GetProfileUseCase
 ) : ViewModel() {
 
@@ -55,10 +59,13 @@ class ProfileViewModel @Inject constructor(
         uiState = uiState.copy(gender = value)
     }
 
+    fun onImageSelected(uri: Uri) {
+        uiState = uiState.copy(selectedImageUri = uri)
+    }
+
     private fun fetchCurrentProfile() {
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, errorMessage = null)
-
             runCatching {
                 getProfileUseCase()
             }.onSuccess { user ->
@@ -76,9 +83,10 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile() {
+    fun updateProfile(context: Context) {
+        uiState = uiState.copy(isLoading = true, errorMessage = null)
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true, errorMessage = null)
+            val imageFile = uiState.selectedImageUri?.let { uriToFile(context, it) }
 
             runCatching {
                 updateProfileUseCase(
@@ -86,7 +94,7 @@ class ProfileViewModel @Inject constructor(
                     surname = uiState.surname,
                     bornIn = uiState.bornIn,
                     gender = uiState.gender,
-                    imagePath = uiState.imagePath
+                    imagePath = imageFile?.absolutePath,
                 )
             }.onSuccess {
                 uiState = uiState.copy(isLoading = false, isSuccess = true)
@@ -94,6 +102,25 @@ class ProfileViewModel @Inject constructor(
                 handleException(exception)
                 uiState = uiState.copy(isLoading = false)
             }
+        }
+    }
+
+    private fun uriToFile(context: Context, uri: Uri): File? {
+        return try {
+            val contentResolver = context.contentResolver
+            val tempFile = File(context.cacheDir, "profile_image_${System.currentTimeMillis()}.jpg")
+            val inputStream = contentResolver.openInputStream(uri)
+            val outputStream = FileOutputStream(tempFile)
+
+            inputStream?.copyTo(outputStream)
+
+            inputStream?.close()
+            outputStream.close()
+
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 

@@ -17,13 +17,18 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -68,11 +73,17 @@ fun CatalogScreen(
                     fontWeight = FontWeight.Bold,
                     style = TextStyle(color = Color.Black)
                 )
-                IconButton(onClick = { onSearch() }) {
+                FilledIconButton(
+                    onClick = { onSearch() },
+                    modifier = Modifier.size(40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        contentColor = Color.Black
+                    )
+                ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = Color.Black,
                         modifier = Modifier.size(22.dp)
                     )
                 }

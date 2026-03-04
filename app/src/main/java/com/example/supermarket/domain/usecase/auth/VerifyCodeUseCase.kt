@@ -2,7 +2,7 @@ package com.example.supermarket.domain.usecase.auth
 
 import com.example.supermarket.domain.value.AuthResult
 import com.example.supermarket.domain.repository.AuthRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 class VerifyCodeUseCase @Inject constructor(
     private val repository: AuthRepository

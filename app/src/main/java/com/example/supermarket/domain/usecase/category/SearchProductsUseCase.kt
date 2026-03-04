@@ -3,7 +3,7 @@ package com.example.supermarket.domain.usecase.category
 import androidx.paging.PagingData
 import com.example.supermarket.domain.entity.Product
 import com.example.supermarket.domain.repository.CatalogRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 class SearchProductsUseCase @Inject constructor(

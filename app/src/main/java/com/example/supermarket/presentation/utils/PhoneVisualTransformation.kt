@@ -21,10 +21,10 @@ class PhoneVisualTransformation : VisualTransformation {
         val offsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int {
                 if (offset <= 0) return offset
-                if (offset <= 1) return offset + 1 // (X
-                if (offset <= 4) return offset + 3 // (XX) XXX
-                if (offset <= 6) return offset + 4 // (XX) XXX-XX
-                if (offset <= 8) return offset + 5 // (XX) XXX-XX-XX
+                if (offset <= 1) return offset + 1
+                if (offset <= 4) return offset + 3
+                if (offset <= 6) return offset + 4
+                if (offset <= 8) return offset + 5
                 return 14
             }
 

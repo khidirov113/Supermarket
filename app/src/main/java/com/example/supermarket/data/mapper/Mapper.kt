@@ -1,5 +1,6 @@
 package com.example.supermarket.data.mapper
 
+import com.example.supermarket.data.remote.dto.AboutDto
 import com.example.supermarket.data.remote.dto.AccessCodeDto
 import com.example.supermarket.data.remote.dto.BannerDto
 import com.example.supermarket.data.remote.dto.CategoryDto
@@ -17,6 +18,7 @@ import com.example.supermarket.domain.value.Store
 import com.example.supermarket.domain.entity.SubCategory
 import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.data.remote.dto.TransactionDto
+import com.example.supermarket.domain.value.About
 import com.example.supermarket.domain.value.Transaction
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -79,7 +81,8 @@ fun UserProfileDto.toDomain(): UserProfile {
         gender = this.gender ?: 1,
         image = this.imagePath,
         bonus = this.balance ?: 0.0,
-        phone = this.phone ?: ""
+        phone = this.phone ?: "",
+        notificationsCount = this.notificationsCount
     )
 }
 
@@ -90,6 +93,28 @@ fun AccessCodeDto.toDomain(): QrCodeData {
     )
 }
 
+
+fun AboutDto.toDomain(): About {
+    val firstImageObj = this.images?.firstOrNull()
+
+    val imagePath = firstImageObj?.imagePath ?: ""
+
+    val fullImageUrl = if (imagePath.isNotEmpty()) {
+        "https://market.tajsoft.tj$imagePath"
+    } else {
+        ""
+    }
+
+    return About(
+        id = this.id,
+        title = this.title ?: "",
+        description = this.description ?: "",
+        phone = this.phone ?: "",
+        telegram = this.telegram ?: "",
+        whatsapp = this.whatsapp ?: "",
+        images = fullImageUrl
+    )
+}
 
 fun StoreDto.toDomain(): Store {
     val formatTime: (String?) -> String = { time ->

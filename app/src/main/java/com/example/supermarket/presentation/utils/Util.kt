@@ -64,7 +64,7 @@ fun CardBannerShimmer() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .padding(horizontal = 20.dp, vertical = 5.dp)
+                .padding(horizontal = 16.dp, vertical = 5.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .shimmerEffect()
         )

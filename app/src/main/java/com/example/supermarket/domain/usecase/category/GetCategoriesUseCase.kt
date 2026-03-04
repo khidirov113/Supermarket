@@ -2,7 +2,7 @@ package com.example.supermarket.domain.usecase.category
 
 import com.example.supermarket.domain.entity.Category
 import com.example.supermarket.domain.repository.CatalogRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 class GetCategoriesUseCase @Inject constructor(

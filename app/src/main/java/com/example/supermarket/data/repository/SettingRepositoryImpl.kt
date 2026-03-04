@@ -9,7 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.supermarket.domain.value.Settings
 import com.example.supermarket.domain.repository.SettingRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

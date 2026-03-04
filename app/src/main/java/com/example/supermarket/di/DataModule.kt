@@ -3,6 +3,7 @@ package com.example.supermarket.di
 import android.content.Context
 import androidx.work.WorkManager
 import com.example.supermarket.data.local.TokenManager
+import com.example.supermarket.data.remote.network.AboutApi
 import com.example.supermarket.data.remote.network.AuthApi
 import com.example.supermarket.data.remote.network.BannerApi
 import com.example.supermarket.data.remote.network.CatalogApiService
@@ -20,6 +21,7 @@ import com.example.supermarket.data.repository.NotificationRepositoryImpl
 import com.example.supermarket.data.repository.ProductRepositoryImpl
 import com.example.supermarket.data.repository.ProfileRepositoryImpl
 import com.example.supermarket.data.repository.QrRepositoryImpl
+import com.example.supermarket.data.repository.RepositoryAboutImpl
 import com.example.supermarket.data.repository.SettingRepositoryImpl
 import com.example.supermarket.data.repository.StoreRepositoryImpl
 import com.example.supermarket.domain.repository.AuthRepository
@@ -29,6 +31,7 @@ import com.example.supermarket.domain.repository.NotificationRepository
 import com.example.supermarket.domain.repository.ProductRepository
 import com.example.supermarket.domain.repository.ProfileRepository
 import com.example.supermarket.domain.repository.QrRepository
+import com.example.supermarket.domain.repository.RepositoryAbout
 import com.example.supermarket.domain.repository.SettingRepository
 import com.example.supermarket.domain.repository.StoreRepository
 import com.example.supermarket.domain.repository.TransactionRepository
@@ -57,6 +60,12 @@ interface DataModule {
 
     @Binds
     @Singleton
+    fun bindAboutRepository(
+        impl: RepositoryAboutImpl
+    ): RepositoryAbout
+
+    @Binds
+    @Singleton
     fun bindProfileRepository(
         impl: ProfileRepositoryImpl
     ): ProfileRepository
@@ -82,39 +91,39 @@ interface DataModule {
 
     @Binds
     @Singleton
-    abstract fun bindStoreRepository(
+    fun bindStoreRepository(
         impl: StoreRepositoryImpl
     ): StoreRepository
 
     @Binds
     @Singleton
-    abstract fun bindAuthRepository(
+    fun bindAuthRepository(
         impl: AuthRepositoryImpl
     ): AuthRepository
 
 
     @Binds
     @Singleton
-    abstract fun bindBannerRepository(
+    fun bindBannerRepository(
         impl: BannerRepositoryImpl
     ): BannerRepository
 
     @Binds
     @Singleton
-    abstract fun bindCatalogRepository(
+    fun bindCatalogRepository(
         impl: CatalogRepositoryImpl
     ): CatalogRepository
 
     @Binds
     @Singleton
-    abstract fun bindQrRepository(
+    fun bindQrRepository(
         impl: QrRepositoryImpl
     ): QrRepository
 
 
     @Binds
     @Singleton
-    abstract fun bindProductRepository(
+    fun bindProductRepository(
         impl: ProductRepositoryImpl
     ): ProductRepository
 
@@ -186,6 +195,10 @@ interface DataModule {
                 .addConverterFactory(converterFactory)
                 .build()
         }
+
+        @Provides
+        @Singleton
+        fun provideAboutApi(retrofit: Retrofit): AboutApi = retrofit.create()
 
         @Provides
         @Singleton

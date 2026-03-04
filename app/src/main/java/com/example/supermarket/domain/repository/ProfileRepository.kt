@@ -14,4 +14,6 @@ interface ProfileRepository {
     suspend fun logout()
 
     suspend fun getUserProfile(): UserProfile
+
+    suspend fun updateFcmToken(fcmToken: String)
 }

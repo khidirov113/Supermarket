@@ -13,7 +13,7 @@ import com.example.supermarket.domain.usecase.setting.UpdateNotificationsEnabled
 import com.example.supermarket.domain.usecase.user.GetProfileUseCase
 import com.example.supermarket.domain.usecase.user.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -85,7 +85,6 @@ class SettingViewModel @Inject constructor(
             isLoading = true
             errorMessage = null
 
-            // ТЎҒИРЛАНДИ: runCatching га ўтказилди
             runCatching {
                 logoutUseCase()
             }.onSuccess {

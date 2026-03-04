@@ -21,12 +21,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -42,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -229,13 +232,20 @@ fun SubCategorySectionBlock(
                 fontSize = 18.sp,
                 color = Color.Black
             )
-            Text(
-                text = "Все",
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                color = Green,
-                modifier = Modifier.clickable { onSeeAllClick() }
+            TextButton(
+                onClick = { onSeeAllClick() },
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Green
+                )
             )
+            {
+                Text(
+                    text = stringResource(R.string.all),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
         }
 
         val products = subCategory.products ?: emptyList()

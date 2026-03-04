@@ -63,7 +63,7 @@ fun MainScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (isAuthenticated) showQrSheet = true else showAuthSheet = true
+                    if (isAuthenticated == true) showQrSheet = true else showAuthSheet = true
                 },
                 containerColor = Green,
                 shape = CircleShape,
@@ -95,9 +95,11 @@ fun MainScreen(
             )
         }
     ) { padding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             NavHost(
                 navController = bottomNavController,
                 startDestination = Screens.Home.route
@@ -137,7 +139,8 @@ fun MainScreen(
                         onLogoutSuccess = {},
                         onNavigateToAuth = { rootNavController.navigate(Screens.AuthScreen.route) },
                         onPrivacyPolicy = { rootNavController.navigate(Screens.PrivacyPolicy.route) },
-                        onNavigateToAppSettings = { rootNavController.navigate(Screens.PushNotification.route) }
+                        onNavigateToAppSettings = { rootNavController.navigate(Screens.PushNotification.route) },
+                        onAboutClick = { rootNavController.navigate(Screens.About.route) }
                     )
                 }
             }

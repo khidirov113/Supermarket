@@ -1,6 +1,7 @@
 package com.example.supermarket.data.local
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -17,15 +18,30 @@ class TokenManager @Inject constructor(
   @ApplicationContext private val context: Context
 ) {
     private val TOKEN_KEY = stringPreferencesKey("access_token")
+    private val TOKEN_FMS = stringPreferencesKey("fcm_token")
 
     val token: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[TOKEN_KEY]
         }
 
+
+    val getFMSToken: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[TOKEN_FMS]
+        }
+
     suspend fun saveToken(token: String) {
         context.dataStore.edit { preferences ->
             preferences[TOKEN_KEY] = token
+        }
+    }
+
+    suspend fun fmsToken(token: String) {
+        Log.d("fmsToken", "fmsToken: $token")
+
+        context.dataStore.edit { preferences ->
+            preferences[TOKEN_FMS] = token
         }
     }
 }

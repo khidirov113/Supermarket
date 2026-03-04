@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,12 +23,24 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,11 +62,12 @@ import coil3.compose.AsyncImage
 import com.example.supermarket.R
 import com.example.supermarket.domain.entity.Banner
 import com.example.supermarket.domain.entity.Product
+import com.example.supermarket.domain.value.UserProfile
 import com.example.supermarket.presentation.ui.theme.Black
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.utils.CardBannerShimmer
+import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
-
 
 @Composable
 fun AppTopBar(
@@ -62,72 +76,91 @@ fun AppTopBar(
     onNotification: () -> Unit,
     onHistoryClick: () -> Unit,
     balance: String?,
-    isAuthenticated: Boolean
+    isAuthenticated: Boolean?
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Box(modifier = Modifier.weight(1f)) {
-            if (isAuthenticated) {
-                if (balance != null) {
-                    Text(
-                        text = balance,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Green,
-                        letterSpacing = 0.5.sp
-                    )
+            when (isAuthenticated) {
+                true -> {
+                    if (balance != null) {
+                        Text(
+                            text = balance,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Green,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
                 }
-            } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onClickAdd() }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.create_system),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Green
-                    )
 
-                    Spacer(modifier = Modifier.width(3.dp))
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_vector_system),
-                        contentDescription = null,
-                        tint = Green,
-                        modifier = Modifier.size(12.dp)
-                    )
+                false -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = ripple(color = Green.copy(alpha = 0.1f)),
+                                onClick = { onClickAdd() }
+                            )
+                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.create_system),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Green
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_vector_system),
+                            contentDescription = null,
+                            tint = Green,
+                            modifier = Modifier.size(12.dp)
+                        )
+                    }
                 }
+                null -> {}
             }
         }
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(R.drawable.ic_notification),
-                contentDescription = stringResource(R.string.notification),
-                modifier = Modifier
-                    .size(18.dp)
-                    .clip(CircleShape)
-                    .clickable { onNotification() },
-                tint = Color.Black
-            )
-
-            if (isAuthenticated) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    painter = painterResource(R.drawable.ic_bonus),
-                    contentDescription = "History",
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clip(CircleShape)
-                        .clickable { onHistoryClick() },
-                    tint = Color.Black
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FilledIconButton(
+                onClick = { onNotification() },
+                modifier = Modifier.size(40.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    contentColor = Color.Black
                 )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_notification),
+                    contentDescription = stringResource(R.string.notification),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            if (isAuthenticated == true) {
+                FilledIconButton(
+                    onClick = { onHistoryClick() },
+                    modifier = Modifier.size(40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_bonus),
+                        contentDescription = "History",
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }
@@ -156,12 +189,12 @@ fun CardBanner(
             ) {
                 HorizontalPager(
                     state = pagerState,
-                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
                     pageSpacing = 12.dp,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(top = 10.dp)
+                        .fillMaxSize()
+                        .height(210.dp)
+                        .padding(top = 5.dp)
                 ) { page ->
 
                     val currentBanner = banners[page]
@@ -217,7 +250,7 @@ fun CardBanner(
                         val width = if (isSelected) 16.dp else 8.dp
                         Box(
                             modifier = Modifier
-                                .padding(4.dp)
+                                .padding(2.dp)
                                 .clip(CircleShape)
                                 .background(color)
                                 .height(6.dp)
@@ -255,13 +288,16 @@ fun DiscountsWeek(
             )
             TextButton(
                 onClick = { onCLickAll() },
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Green
+                )
             )
             {
                 Text(
                     text = stringResource(R.string.all),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Green
                 )
             }
         }

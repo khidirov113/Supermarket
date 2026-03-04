@@ -15,5 +15,6 @@ sealed class Screens(val route: String) {
     data object PushNotification : Screens("push_notification")
     data object AuthScreen : Screens("auth_screen")
     data object Profile : Screens("profile")
+    data object About : Screens("about")
     data object PrivacyPolicy : Screens("privacy_policy")
 }

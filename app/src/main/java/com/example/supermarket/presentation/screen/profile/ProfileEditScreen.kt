@@ -1,6 +1,10 @@
 package com.example.supermarket.presentation.screen.profile
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,12 +50,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.example.supermarket.R
 import com.example.supermarket.presentation.ui.theme.Green
 import com.example.supermarket.presentation.ui.theme.Grey200
@@ -69,8 +75,15 @@ fun ProfileEditScreen(
     val title = if (viewModel.uiState.name.isEmpty()) "Добавить данные" else "Редактировать профиль"
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember { mutableStateOf(false) }
-
     val context = LocalContext.current
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri: Uri? ->
+            uri?.let { viewModel.onImageSelected(it) }
+        }
+    )
+
     LaunchedEffect(viewModel.uiState.errorMessage) {
         viewModel.uiState.errorMessage?.let { msg ->
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
@@ -88,8 +101,7 @@ fun ProfileEditScreen(
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let {
-                        val date =
-                            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it))
+                        val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it))
                         viewModel.onBornInChange(date)
                     }
                     showDatePicker = false
@@ -104,10 +116,7 @@ fun ProfileEditScreen(
                 title = { Text(title, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_vector_stroke),
-                            contentDescription = null
-                        )
+                        Icon(painter = painterResource(id = R.drawable.ic_vector_stroke), contentDescription = null)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
@@ -115,7 +124,7 @@ fun ProfileEditScreen(
         },
         bottomBar = {
             Button(
-                onClick = { viewModel.updateProfile() },
+                onClick = { viewModel.updateProfile(context) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -146,19 +155,36 @@ fun ProfileEditScreen(
                         .background(Grey200),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.size(70.dp),
-                        tint = Color.White
-                    )
+                    val currentImage = viewModel.uiState.selectedImageUri ?: viewModel.uiState.imagePath
+
+                    if (currentImage != null) {
+                        AsyncImage(
+                            model = currentImage,
+                            contentDescription = "Profile Photo",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(70.dp),
+                            tint = Color.White
+                        )
+                    }
                 }
+
                 Icon(
                     painter = painterResource(id = R.drawable.ic_camera),
-                    contentDescription = null,
+                    contentDescription = "Pick Image",
                     modifier = Modifier
                         .padding(bottom = 12.dp)
-                        .size(24.dp),
+                        .size(24.dp)
+                        .clickable {
+                            photoPickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
                     tint = Color.LightGray
                 )
             }
@@ -177,11 +203,7 @@ fun ProfileEditScreen(
                 label = { Text("Введите имя") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Green,
-                    focusedLabelColor = Green,
-                    cursorColor = Green
-                )
+                colors = customColors
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -192,12 +214,7 @@ fun ProfileEditScreen(
                 label = { Text("Введите фамилию") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Green,
-                    focusedLabelColor = Green,
-                    cursorColor = Green
-                )
-
+                colors = customColors
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -209,11 +226,7 @@ fun ProfileEditScreen(
                 label = { Text("Укажите дату рождения") },
                 trailingIcon = {
                     IconButton(onClick = { showDatePicker = true }) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_calendar),
-                            contentDescription = null,
-                            tint = Green
-                        )
+                        Icon(painterResource(id = R.drawable.ic_calendar), contentDescription = null, tint = Green)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -223,43 +236,19 @@ fun ProfileEditScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                GenderOption(
-                    "Мужской",
-                    viewModel.uiState.gender == 1
-                ) { viewModel.onGenderChange(1) }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                GenderOption("Мужской", viewModel.uiState.gender == 1) { viewModel.onGenderChange(1) }
                 Spacer(modifier = Modifier.width(32.dp))
-                GenderOption(
-                    "Женский",
-                    viewModel.uiState.gender == 2
-                ) { viewModel.onGenderChange(2) }
+                GenderOption("Женский", viewModel.uiState.gender == 2) { viewModel.onGenderChange(2) }
             }
         }
     }
 }
 
 @Composable
-fun GenderOption(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable { onClick() }) {
-        RadioButton(
-            selected = isSelected,
-            onClick = onClick,
-            colors = RadioButtonDefaults.colors(selectedColor = Green)
-        )
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black
-        )
+fun GenderOption(text: String, isSelected: Boolean, onClick: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { onClick() }) {
+        RadioButton(selected = isSelected, onClick = onClick, colors = RadioButtonDefaults.colors(selectedColor = Green))
+        Text(text = text, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
     }
 }

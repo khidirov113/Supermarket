@@ -86,6 +86,12 @@ fun HomeScreen(
 
     var showBottomSheetById by remember { mutableStateOf<Long?>(null) }
 
+    var isTopBarVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(300)
+        isTopBarVisible = true
+    }
     val context = LocalContext.current
 
     LaunchedEffect(errorMessage, errorMessageBanner) {
@@ -111,14 +117,14 @@ fun HomeScreen(
             ) {
                 AppTopBar(
                     onClickAdd = {
-                        if (!isAuthenticated) {
+                        if (isAuthenticated != true) {
                             showAuthSheet = true
                         }
                     },
                     balance = balance,
                     isAuthenticated = isAuthenticated,
                     onNotification = onNotificationClick,
-                    onHistoryClick = onHistoryClick
+                    onHistoryClick = onHistoryClick,
                 )
             }
         }
@@ -144,8 +150,7 @@ fun HomeScreen(
                         val bannersJob = launch { bannerViewModel.fetchBanners() }
                         val productsJob = launch { productViewModel.fetchProducts() }
                         val balanceJob =
-                            launch { if (isAuthenticated) homeViewModel.fetchBalance() }
-
+                            launch { if (isAuthenticated == true) homeViewModel.fetchBalance() }
                         delay(2000)
                         joinAll(bannersJob, productsJob, balanceJob)
                         isRefreshing = false
@@ -203,7 +208,7 @@ fun HomeScreen(
                         }
                     }
                     item(span = { GridItemSpan(2) }) {
-                        if (isAuthenticated) {
+                        if (isAuthenticated == true) {
                             AllTransaction(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -214,7 +219,7 @@ fun HomeScreen(
                     }
 
                     item(span = { GridItemSpan(2) }) {
-                        if (isAuthenticated) {
+                        if (isAuthenticated == true) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()

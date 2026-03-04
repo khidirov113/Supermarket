@@ -7,5 +7,6 @@ data class UserProfile(
     val gender: Int,
     val image: String?,
     val bonus: Double?,
-    val phone: String?
+    val phone: String?,
+    val notificationsCount: Int?,
 )

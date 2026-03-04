@@ -19,7 +19,8 @@ interface ProfileApi {
         @Part("surname") surname: RequestBody?,
         @Part("born_in") bornIn: RequestBody?,
         @Part("gender") gender: RequestBody?,
-        @Part image: MultipartBody.Part?
+        @Part image: MultipartBody.Part?,
+        @Part("fcm_token") fcmToken: RequestBody?
     )
 
     @GET("/api/logout")
